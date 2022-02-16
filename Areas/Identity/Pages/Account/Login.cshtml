@@ -1,0 +1,135 @@
+@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "تسجيل الدخول";
+}
+
+@section styles
+{
+    <style>
+        .fa-google {
+            font-size: 3rem;
+            background: 
+                linear-gradient(to bottom left, transparent 49%,#ea4335 50%) 105% 0%  /37% 30%,
+                linear-gradient(to bottom right,transparent 49%,#fbbc05 50%) 64% 100% /35% 43%,
+                
+                radial-gradient(farthest-side, #4285f4 46%,transparent 47%),
+                linear-gradient( 47deg,        #34a853 42%,transparent 43%),
+                linear-gradient(-72deg,        #fbbc05 42%,transparent 43%),
+                linear-gradient(-199deg,       #ea4335 42%,transparent 43%);
+            background-repeat:no-repeat;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+    </style>
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <section>
+            <form id="account" method="post">
+                <h4>استخدم حساب محلي لتسجيل الدخول</h4>
+                <hr />
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Input.Email"></label>
+                    <input asp-for="Input.Email" class="form-control" />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Input.Password"></label>
+                    <div class="input-group" id="show_hide_password">
+                        <input class="form-control passwordDisplay" asp-for="Input.Password">
+                        <div class="input-group-addon">
+                            <a href="" class="form-control" tabindex="-1">
+                                <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label asp-for="Input.RememberMe">
+                            <input asp-for="Input.RememberMe" />
+                            @Html.DisplayNameFor(m => m.Input.RememberMe)
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">تسجيل دخول</button>
+                </div>
+                <div class="form-group">
+                    <p>
+                        <a id="forgot-password" asp-page="./ForgotPassword">هل نسيت كلمة السر؟</a>
+                    </p>
+                    <p>
+                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">إنشاء حساب</a>
+                    </p>
+                    <p>
+                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">إعادة إرسال إيميل لتأكيد الحساب</a>
+                    </p>
+                </div>
+            </form>
+        </section>
+    </div>
+    <div class="col-md-6 col-md-offset-2">
+        <section>
+            <h4>أو استخدم خدمة أخرى لتسجيل الدخول.</h4>
+            <hr />
+            @{
+                if ((Model.ExternalLogins?.Count ?? 0) == 0)
+                {
+                    <div>
+                        <p>
+                            There are no external authentication services configured. See <a href="https://go.microsoft.com/fwlink/?LinkID=532715">this article</a>
+                            for details on setting up this ASP.NET application to support logging in via external services.
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                        <div>
+                            <p>
+                                <button type="submit" class="btn" name="provider" value="Facebook" >
+                                    <i class='fab fa-facebook fa-3x' style="color: blue;"></i>
+                                </button>
+                                <button type="submit" class="btn" name="provider" value="Google" >
+                                    <i class='fab fa-google fa-2x'></i>
+                                </button>
+                                @* @foreach (var provider in Model.ExternalLogins)
+                                {
+                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                                } *@
+                            </p>
+                        </div>
+                    </form>
+                }
+            }
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function() {
+            $("#show_hide_password a").on('click', function(event) {
+                event.preventDefault();
+                if($('#show_hide_password input').attr("type") == "text"){
+                    $('.passwordDisplay').attr('type', 'password');
+                    $('#show_hide_password i').addClass( "fa-eye-slash" );
+                    $('#show_hide_password i').removeClass( "fa-eye" );
+                }else if($('#show_hide_password input').attr("type") == "password"){
+                    $('.passwordDisplay').attr('type', 'text');
+                    $('#show_hide_password i').removeClass( "fa-eye-slash" );
+                    $('#show_hide_password i').addClass( "fa-eye" );
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,131 @@
+@model KiddieParadies.ViewModels.BlogFormViewModel
+
+@section styles
+{
+    <!-- include summernote css -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+
+    <style>
+        section {
+            margin-bottom: 15px;
+            padding: 1%;
+        }
+
+        body section:first-of-type {
+            padding: 0px !important;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            margin-top: 4em;
+        }
+
+        ::-webkit-scrollbar-track {
+            border-radius: 10px;
+            margin-top: 3.5em !important;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #FFFEB0;
+            border-radius: 10px;
+        }
+
+        .toast-container {
+            top: 55px !important;
+        }
+
+        .field-validation-error {
+            color: #F00;
+        }
+
+        .fas {
+            font-size: 21px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        input {
+        direction: rtl !important;
+        text-align: right !important;
+        }
+    </style>
+}
+<section>
+    <div id="errors" style="color: #F00;"></div>
+    @using (Html.BeginForm("Save", "Blogs", FormMethod.Post, htmlAttributes: new { @id="blogForm"/*, target = "_blank"*/, @enctype="multipart/form-data" }))
+    {
+        <div>
+            @Html.LabelFor(m => m.Title, new { @class = "col-form-label" })
+            @Html.TextBoxFor(m => m.Title, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Title)
+        </div>
+        <div>
+            @Html.LabelFor(m => m.ShortContent, new { @class = "col-form-label" })
+            @Html.TextBoxFor(m => m.ShortContent, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.ShortContent)
+        </div>
+        <div>
+            @Html.LabelFor(m => m.Image, new { @class = "col-form-label" })
+            @Html.TextBoxFor(m => m.Image, htmlAttributes: new { @type="file", @class="form-control", @accept="image/png, image/jpg, image/jpeg" })
+            @Html.ValidationMessageFor(m => m.Image)
+        </div>
+        <div>
+            @* @Html.LabelFor(m => m.Content, new { @class = "col-form-label" }) *@
+            @Html.TextAreaFor(m => m.Content, htmlAttributes: new { id = "summernote", name = "editordata", @class="form-control" })
+            @Html.ValidationMessageFor(m => m.Content)
+            @*@Html.TextArea(Html.NameFor(Model.Content), htmlAttributes: , name = @Model.Content })*@
+            @*<textarea id="summernote" name="editordata"></textarea>*@
+            @*<a type="submit" target="_blank" class="btn btn-primary">Save</a>*@
+        </div>
+        @Html.HiddenFor(m => m.Id)
+        <input type="submit" class="btn btn-primary" value="حفظ" id="saveBtn" />
+    }
+</section>
+
+@section scripts
+{
+    <!-- include summernote js -->
+    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            $("#saveBtn").attr("disabled", "disabled");
+            // Initialize rich text editor
+            $('#summernote').summernote({
+                height: 300,                 // set editor height
+                minHeight: null,             // set minimum height of editor
+                maxHeight: null,             // set maximum height of editor
+                focus: true                  // set focus to editable area after initializing summernote
+                //, lang: 'ar'
+            });
+
+            $('#blogForm').each(function () {
+                if ($(this).data('validator'))
+                    $(this).data('validator').settings.ignore = ".note-editor *";
+            });
+
+            $("#blogForm").on("blur",
+                "input",
+                () => {
+                    if ($("#blogForm").valid())
+                        $("#saveBtn").removeAttr("disabled");
+                    else
+                        $("#saveBtn").attr("disabled", "disabled");
+            });
+
+            var form = $('#BlogForm'), origForm = form.serialize();
+            $('#blogForm :input').on('change input',
+                function () {
+                    if (form.serialize() !== origForm)
+                        $("#saveBtn").removeAttr("disabled");
+                    else
+                        $("#saveBtn").attr("disabled", "disabled");
+
+                    $("#errors").html("");
+                });
+        });
+    </script>
+}

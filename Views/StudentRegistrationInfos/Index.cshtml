@@ -1,0 +1,882 @@
+@model KiddieParadies.Controllers.Apis.Dtos.StudentRegistrationInfoDto
+
+@{
+    ViewData["Title"] = "مواعيد تسجيل الطلاب";
+}
+
+@section styles
+{
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-typeahead/2.11.0/jquery.typeahead.css">
+    <style>
+        section {
+            margin-bottom: 15px;
+            padding: 1%;
+        }
+
+        body section:first-of-type {
+            padding: 0px !important;
+        }
+
+        .fa-trash {
+            color: red;
+        }
+
+        .fa-edit {
+            color: #55FF1A;
+        }
+
+        .fas {
+            font-size: 21px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        a img {
+            height: 35px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            margin-top: 4em;
+        }
+
+        ::-webkit-scrollbar-track {
+            border-radius: 10px;
+            margin-top: 3.5em !important;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #FFFEB0;
+            border-radius: 10px;
+        }
+
+        .bg-light {
+            background-color: #FFFEB0 !important;
+        }
+
+        @@media only screen and (max-width: 760px) {
+            /* Force table to not be like tables anymore */
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+            }
+                /* Hide table headers (but not display: none;, for accessibility) */
+                thead tr {
+                    /*position: absolute;
+                    top: -9999px;
+                    left: -9999px;*/
+                    display: none;
+                }
+
+            tr {
+                border: 1px solid #ccc;
+            }
+
+            td {
+                /* Behave  like a "row" */
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-right: 50% !important;
+            }
+
+                td:before {
+                    /* Now like a table header */
+                    position: absolute;
+                    /* Top/left values mimic padding */
+                    top: 6px;
+                    right: 6px;
+                    width: 45%;
+                    padding-left: 10px;
+                    white-space: nowrap;
+                }
+                /*
+                Label the data
+                */
+
+                td:nth-of-type(1):before {
+                    content: "العام الدراسي";
+                }
+
+                td:nth-of-type(2):before {
+                    content: "من تاريخ";
+                }
+
+                td:nth-of-type(3):before {
+                    content: "حتى تاريخ";
+                }
+
+                td:nth-of-type(4):before {
+                    content: "المرحلة الأولى";
+                }
+
+                td:nth-of-type(5):before {
+                    content: "المرحلة الثانية";
+                }
+
+                td:nth-of-type(6):before {
+                    content: "المرحلة الثالثة";
+                }
+
+                td:nth-of-type(7):before {
+                    content: "إدارة";
+                }
+        }
+
+        .toast-container {
+            top: 55px !important;
+        }
+
+        .field-validation-error {
+            color: #F00;
+        }
+
+        .odd {
+            background-color: #F2F0FD;
+        }
+
+        td {
+            border: 1px solid white !important;
+        }
+
+        .twitter-typeahead {
+            width: 100% !important;
+        }
+
+        /*.tt-query, .tt-input,*/ /* UPDATE: newer versions use tt-input instead of tt-query */
+        .tt-hint {
+            width: 396px;
+            height: 30px;
+            padding: 8px 12px;
+            font-size: 24px;
+            line-height: 30px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .tt-query, .tt-input { /* UPDATE: newer versions use tt-input instead of tt-query */
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+        }
+
+        .tt-hint {
+            color: #999;
+        }
+
+        .tt-menu { /* UPDATE: newer versions use tt-menu instead of tt-dropdown-menu */
+            width: 100% !important;
+            margin-top: 12px;
+            padding: 8px 0;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            box-shadow: 0 5px 10px rgba(0,0,0,.2);
+        }
+
+        /*.tt-suggestion {
+            padding: 3px 20px;
+            font-size: 18px;
+            line-height: 24px;
+        }*/
+
+        .tt-suggestion.tt-is-under-cursor { /* UPDATE: newer versions use .tt-suggestion.tt-cursor */
+            color: #fff;
+            background-color: #0097cf;
+        }
+
+        .tt-suggestion p {
+            margin: 0;
+        }
+
+        .tt-dataset {
+            padding-right: 10px;
+        }
+
+        input {
+            direction: rtl !important;
+            text-align: right !important;
+        }
+    </style>
+}
+<section>
+    <button class="btn btn-primary" id="new" data-bs-toggle="modal" data-bs-target="#manageModal">
+        موعد
+        جديد
+    </button>
+
+    <div class="toast-container position-fixed end-0 p-3" style="top: 60px !important;">
+
+        <div class="toast fade hide" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <img src="/Logo.png" style="width: 40px;" class="rounded me-2" alt="روضة السعادة">
+                <strong class="me-auto">روضة السعادة</strong>
+                <small class="text-muted">الآن</small>
+                <button type="button" id="toastBtn" class="btn-close" data-bs-dismiss="toast"
+                        aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="notification">
+                تمت إضافة الموعد بنجاح.
+            </div>
+        </div>
+    </div>
+</section>
+<section class="table-responsive">
+    <table id="info" class="table align-middle display">
+        <thead>
+            <tr>
+                <th scope="col">العام الدراسي</th>
+                <th scope="col">من تاريخ</th>
+                <th scope="col">حتى تاريخ</th>
+                <th scope="col">المرحلة الأولى</th>
+                <th scope="col">المرحلة الثانية</th>
+                <th scope="col">المرحلة الثالثة</th>
+                <th scope="col">إدارة</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</section>
+<div class="modal fade" id="manageModal" tabindex="-1" aria-labelledby="manageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="manageModalLabel">موعد جديد</h5>
+                <button type="button" class="btn-close clear-data" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="errors" style="color: #F00;"></div>
+            @using (Html.BeginForm(method: FormMethod.Post, htmlAttributes: new { @id = "manageStudentRegistrationInfos", @autocomplete = "off" }))
+            {
+                <div class="modal-body">
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.YearName, new { @class = "col-form-label" })
+                        @Html.TextBoxFor(m => m.YearName, new { @class = "form-control", @id = "yearName" })
+                        @Html.ValidationMessageFor(m => m.YearName)
+                        @Html.HiddenFor(m => m.YearId, new { @id = "yearId" })
+                    </div>
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.FromDate, new { @class = "col-form-label" })
+                        @Html.TextBoxFor(m => m.FromDate, new { @class = "form-control", @id = "fromDate", @type = "datetime-local" })
+                        @Html.ValidationMessageFor(m => m.FromDate)
+                    </div>
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.ToDate, new { @class = "col-form-label" })
+                        @Html.TextBoxFor(m => m.ToDate, new { @class = "form-control", @id = "toDate", @type = "datetime-local" })
+                        @Html.ValidationMessageFor(m => m.ToDate)
+                    </div>
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.LevelOne, new { @class = "col-form-label" })
+                        @Html.TextBoxFor(m => m.LevelOne, new { @class = "form-control", @id = "levelOne", @type = "number" })
+                        @Html.ValidationMessageFor(m => m.LevelOne)
+                    </div>
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.LevelTwo, new { @class = "col-form-label" })
+                        @Html.TextBoxFor(m => m.LevelTwo, new { @class = "form-control", @id = "levelTwo", @type = "number" })
+                        @Html.ValidationMessageFor(m => m.LevelTwo)
+                    </div>
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.LevelThree, new { @class = "col-form-label" })
+                        @Html.TextBoxFor(m => m.LevelThree, new { @class = "form-control", @id = "levelThree", @type = "number" })
+                        @Html.ValidationMessageFor(m => m.LevelThree)
+                    </div>
+                </div>
+                @Html.HiddenFor(m => m.Id, new { @id = "studentRegistrationInfoId" })
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" id="addBtn">إضافة</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">حذف موعد</h5>
+                <button type="button" class="btn-close clear-data" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="DeleteStudentRegistrationInfo" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <p>هل أنت متأكد من أنك تريد حذف الموعد?</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">نعم</button>
+                    <button type="button" class="btn btn-secondary clear-data" data-bs-dismiss="modal">لا</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/1.3.1/typeahead.bundle.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+    <script type="text/javascript">
+
+        function IgnoreUTC(dateTime) {
+            let hoursDiff = dateTime.getHours() - dateTime.getTimezoneOffset() / 60;
+            let minutesDiff = (dateTime.getMinutes() - dateTime.getTimezoneOffset()) % 60;
+            dateTime.setHours(hoursDiff);
+            dateTime.setMinutes(minutesDiff);
+            return dateTime;
+        }
+
+        function ToDisplayDateTime(dateTime) {
+            if (dateTime.includes("T")) {
+                dateTime = dateTime.split('T');
+                var date = dateTime[0];
+                var time = dateTime[1].split(":");
+                if (time[0] == "00") {
+                    time = "12:" + time[1] + " ص";
+                }
+                else if (time[0] == "12") {
+                    time = "12:" + time[1] + " م";
+                }
+                else if (parseInt(time[0]) > 12) {
+                    if ((parseInt(time[0]) % 12) > 9)
+                        time = (parseInt(time[0]) % 12) + ":" + time[1] + " م";
+                    else
+                        time = "0" + (parseInt(time[0]) % 12) + ":" + time[1] + " م";
+                }
+                else if (parseInt(time[0]) < 12) {
+                    time = time[0] + ":" + time[1] + " ص";
+                }
+                return date + " " + time;
+            }
+            return dateTime;
+        }
+
+        function ToInputDateTime(date, field) {
+            date = date.split(" ");
+            var time = date[1].split(":");
+            if (date[2] == "ص") {
+
+                if (time[0] == "12") {
+                    time[0] = "00";
+                }
+                date = date[0] + "T" + time[0] + ":" + time[1];
+            }
+            else if (date[2] == "م") {
+                if (time[0] == "12") {
+                    time[0] = "12";
+                }
+                else
+                    time[0] = parseInt(time[0]) + 12;
+                date = date[0] + "T" + time[0] + ":" + time[1];
+            }
+            field.val(date);
+        }
+
+        function RenderInfoList(table, tryNumber = 0) {
+            $.ajax({
+                async: false,
+                url: '/api/studentRegistrationInfos',
+                method: 'GET',
+                contentType: 'application/json',
+                dataType: 'json',
+                statusCode: {
+                    200: function (studentRegistrationInfos) {
+                        for (var studentRegistrationInfo of studentRegistrationInfos) {
+                            table.row.add([
+                                studentRegistrationInfo.yearName, ToDisplayDateTime(studentRegistrationInfo.fromDate), ToDisplayDateTime(studentRegistrationInfo.toDate),
+                                studentRegistrationInfo.levelOne, studentRegistrationInfo.levelTwo, studentRegistrationInfo.levelThree,
+                                '<a href="#" class="edit-btn" data-id=' +
+                                studentRegistrationInfo.id +
+                                '><i class="fas fa-edit"></i></a>' +
+                                '<a href="#" class="remove-btn" data-id=' +
+                                studentRegistrationInfo.id +
+                                '><i class="fas fa-trash"></i></a>'
+                            ])
+                                .node().id = "studentRegistrationInfo_" + studentRegistrationInfo.id;
+                            table.draw(false);
+                            $("#studentRegistrationInfo_" + studentRegistrationInfo.id).attr("year_Id", studentRegistrationInfo.yearId);
+                        }
+                    },
+                    500: function () {
+                        if (tryNumber == 2)
+                            window.location.reload();
+                        else
+                            RenderInfoList(table, ++tryNumber);
+                    }
+                }
+            });
+        }
+
+        function ClearInputs() {
+            $('#fromDate').val('');
+            $('#toDate').val('');
+            $("#studentRegistrationInfoId").val(0);
+            $("#levelOne").val('');
+            $("#levelTwo").val('');
+            $("#levelThree").val('');
+            $("yearName").val('');
+            $("#yearId").val(0);
+            $("#yearName").typeahead("val", "");
+
+            studentRegistrationInfoId = null;
+
+            $("#addBtn").attr("disabled", "disabled");
+
+            // get the form inside we are working - change selector to your form as needed
+            var form = $("#manageStudentRegistrationInfos");
+
+            // get validator object
+            var validator = form.validate();
+
+            // get errors that were created using jQuery.validate.unobtrusive
+            var errors = form.find(".field-validation-error span");
+
+            // trick unobtrusive to think the elements were succesfully validated
+            // this removes the validation messages
+            errors.each(function () { validator.settings.success($(this)); })
+
+            // clear errors from validation
+            validator.resetForm();
+        }
+
+        $(document).ready(function () {
+
+            $("input[type='datetime-local']").keydown(function (e) {
+                var keyCode = e.keyCode || e.which;
+
+                if (keyCode != 9)
+                    return false;
+            });
+
+            $("#yearName").keydown(function (e) {
+                var keyCode = e.keyCode || e.which;
+
+                if (!((keyCode == 9) || (keyCode == 13) || (keyCode == 16)) && $("#yearId").val() != "0")
+                    $("#yearId").val("0");
+            });
+
+            var infoTable = $('#info').DataTable({
+                "columnDefs": [
+                    { "type": "date-dd-MM-yyyy", targets: 1 },
+                    { "type": "date-dd-MM-yyyy", targets: 2 }
+                ],
+                "language": {
+                    "url": "https://cdn.datatables.net/plug-ins/1.11.4/i18n/ar.json"
+                }
+            });
+
+            RenderInfoList(infoTable);
+
+            // sort date
+            (function () {
+
+                var customDateDDMMMYYYYToOrd = function (date) {
+                    "use strict"; //let's avoid tom-foolery in this function
+                    // Convert to a number YYYYMMDD which we can use to order
+                    var dateParts = date.split(/-/);
+                    return (dateParts[2] * 10000) +
+                        ($.inArray(dateParts[1].toUpperCase(),
+                            ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]) *
+                            100) +
+                        (dateParts[0] * 1);
+                };
+
+                // This will help DataTables magic detect the "dd-MMM-yyyy" format; Unshift
+                // so that it's the first data type (so it takes priority over existing)
+                jQuery.fn.dataTableExt.aTypes.unshift(
+                    function (sData) {
+                        "use strict"; //let's avoid tom-foolery in this function
+                        if (/^([0-2]?\d|3[0-1])-(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)-\d{4}/i.test(sData)) {
+                            return 'date-dd-mmm-yyyy';
+                        }
+                        return null;
+                    }
+                );
+
+                // define the sorts
+                jQuery.fn.dataTableExt.oSort['date-dd-mmm-yyyy-asc'] = function (a, b) {
+                    "use strict"; //let's avoid tom-foolery in this function
+                    var ordA = customDateDDMMMYYYYToOrd(a),
+                        ordB = customDateDDMMMYYYYToOrd(b);
+                    return (ordA < ordB) ? -1 : ((ordA > ordB) ? 1 : 0);
+                };
+
+                jQuery.fn.dataTableExt.oSort['date-dd-mmm-yyyy-desc'] = function (a, b) {
+                    "use strict"; //let's avoid tom-foolery in this function
+                    var ordA = customDateDDMMMYYYYToOrd(a),
+                        ordB = customDateDDMMMYYYYToOrd(b);
+                    return (ordA < ordB) ? 1 : ((ordA > ordB) ? -1 : 0);
+                };
+
+            })();
+            // end sort date
+
+            $("#manageStudentRegistrationInfos").on("blur",
+                "input",
+                () => {
+                    if ($("#manageStudentRegistrationInfos").valid())
+                        $("#addBtn").removeAttr("disabled");
+                    else
+                        $("#addBtn").attr("disabled", "disabled");
+                });
+
+            $('.clear-data').on('click',
+                function () {
+                    ClearInputs();
+                });
+
+            $('#manageModal').on('shown.bs.modal',
+                function () {
+                    $('#yearName').focus();
+                });
+
+            $('#manageModal').on('hidden.bs.modal',
+                function () {
+                    ClearInputs();
+                });
+
+            var studentRegistrationInfoId = null;
+
+            $("#info").on("click",
+                "a.edit-btn",
+                function (e) {
+                    e.preventDefault();
+                    studentRegistrationInfoId = $(this).attr('data-id');
+                    $("#studentRegistrationInfoId").val(studentRegistrationInfoId);
+                    var tableRow = $("#studentRegistrationInfo_" + studentRegistrationInfoId);
+                    $("#yearName").val(tableRow.children().eq(0).text());
+                    $("#yearName").typeahead("val", tableRow.children().eq(0).text());
+                    $("#yearId").val($("#studentRegistrationInfo_" + studentRegistrationInfoId).attr("year_Id"));
+                    ToInputDateTime(tableRow.children().eq(1).text(), $('#fromDate'));
+                    ToInputDateTime(tableRow.children().eq(2).text(), $('#toDate'));
+                    $("#levelOne").val(tableRow.children().eq(3).text());
+                    $("#levelTwo").val(tableRow.children().eq(4).text());
+                    $("#levelThree").val(tableRow.children().eq(5).text());
+                    $('#manageModal button[type="submit"]').text('حفظ التعديلات');
+                    $("#manageModalLabel").text("تعديل موعد");
+                    $('#manageModal').modal('toggle');
+                });
+
+            $("#new").click(callback => {
+                $('#manageModal button[type="submit"]').text('إضافة');
+                $("#manageModalLabel").text("موعد جديد");
+                ClearInputs();
+            });
+
+            $("#info").on("click",
+                "a.remove-btn",
+                function (e) {
+                    e.preventDefault();
+                    studentRegistrationInfoId = $(this).attr('data-id');
+                    $('#deleteModal').modal('toggle');
+                });
+
+            $('#manageStudentRegistrationInfos').submit(function (e) {
+                e.preventDefault();
+
+                if ($('#manageModal button[type="submit"]').text() == "حفظ التعديلات") {
+                    $.ajax({
+                        async: false,
+                        url: '/api/studentRegistrationInfos',
+                        method: 'PUT',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        data: JSON.stringify({
+                            Id: $('#studentRegistrationInfoId').val(),
+                            FromDate: IgnoreUTC(new Date($('#fromDate').val())),
+                            ToDate: IgnoreUTC(new Date($('#toDate').val())),
+                            YearName: $("#yearName").val(), YearId: $("#yearId").val(),
+                            LevelOne: $("#levelOne").val(), LevelTwo: $("#levelTwo").val(),
+                            LevelThree: $("#levelThree").val()
+                        }),
+                        statusCode: {
+                            200: function (studentRegistrationInfo) {
+                                var row = $("#studentRegistrationInfo_" + studentRegistrationInfoId);
+                                row.find("td").eq(0).text(studentRegistrationInfo.yearName);
+                                row.find("td").eq(1).text(ToDisplayDateTime(studentRegistrationInfo.fromDate));
+                                row.find("td").eq(2).text(ToDisplayDateTime(studentRegistrationInfo.toDate));
+                                row.find("td").eq(3).text(studentRegistrationInfo.levelOne);
+                                row.find("td").eq(4).text(studentRegistrationInfo.levelTwo);
+                                row.find("td").eq(5).text(studentRegistrationInfo.levelThree);
+                                $('#manageModal').modal('toggle');
+                                $("#notification").text("تم حفظ التعديلات على الموعد بنجاح.");
+                                $('.toast').toast('show');
+                                ClearInputs();
+                            },
+                            400: function (response) {
+                                var errorList = "<p>يرجى إصلاح الأخطاء التالية</p><ul>";
+                                if (response.responseJSON != undefined)
+                                    for (var field in response.responseJSON) {
+                                        for (var error of response.responseJSON[field]) {
+                                            if (field.length > 2)
+                                                errorList += "<li>الحقل '" + field + "': " + error + "</li>";
+                                            else
+                                                errorList += "<li>" + error + "</li>";
+                                        }
+                                    }
+                                else
+                                    errorList += "<li>" + response.responseText + "</li>";
+                                errorList += "</ul>";
+                                $("#errors").html(errorList);
+                                $('#errors')[0].scrollIntoView({ behavior: 'smooth' });
+                                $("#addBtn").attr("disabled", "disabled");
+                            },
+                            500: function (response) {
+                                $('#manageModal').modal('toggle');
+                                ClearInputs();
+                                $("#notification").text(response.responseText);
+                                $('.toast').toast('show');
+                            }
+                        }
+                    });
+                } else if ($('#manageModal button[type="submit"]').text().includes("إضافة")) {
+                    $.ajax({
+                        async: false,
+                        url: '/api/studentRegistrationInfos',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        data: JSON.stringify({
+                            Id: $('#studentRegistrationInfoId').val(),
+                            FromDate: IgnoreUTC(new Date($('#fromDate').val())),
+                            ToDate: IgnoreUTC(new Date($('#toDate').val())),
+                            YearName: $("#yearName").val(), YearId: $("#yearId").val(),
+                            LevelOne: $("#levelOne").val(), LevelTwo: $("#levelTwo").val(),
+                            LevelThree: $("#levelThree").val()
+                        }),
+                        statusCode: {
+                            200: function (studentRegistrationInfo) {
+                                infoTable.row.add([
+                                    studentRegistrationInfo.yearName, ToDisplayDateTime(studentRegistrationInfo.fromDate), ToDisplayDateTime(studentRegistrationInfo.toDate),
+                                    studentRegistrationInfo.levelOne, studentRegistrationInfo.levelTwo, studentRegistrationInfo.levelThree,
+                                    '<a href="#" class="edit-btn" data-id=' +
+                                    studentRegistrationInfo.id +
+                                    '><i class="fas fa-edit"></i></a>' +
+                                    '<a href="#" class="remove-btn" data-id=' +
+                                    studentRegistrationInfo.id +
+                                    '><i class="fas fa-trash"></i></a>'
+                                ]).node().id = "studentRegistrationInfo_" + studentRegistrationInfo.id;
+                                infoTable.draw(false);
+                                $('#manageModal').modal('toggle');
+                                $("#notification").text("تمت إضافة الموعد بنجاح.");
+                                $('.toast').toast('show');
+                                ClearInputs();
+                            },
+                            400: function (response) {
+                                var errorList = "<p>يرجى إصلاح الأخطاء التالية</p><ul>";
+                                if (response.responseJSON != undefined)
+                                    for (var field in response.responseJSON) {
+                                        for (var error of response.responseJSON[field]) {
+                                            if (field.length > 2)
+                                                errorList += "<li>الحقل '" + field + "': " + error + "</li>";
+                                            else
+                                                errorList += "<li>" + error + "</li>";
+                                        }
+                                    }
+                                else
+                                    errorList += "<li>" + response.responseText + "</li>";
+                                errorList += "</ul>";
+                                $("#errors").html(errorList);
+                                $('#errors')[0].scrollIntoView({ behavior: 'smooth' });
+                                $("#addBtn").attr("disabled", "disabled");
+                            },
+                            500: function (response) {
+                                $('#manageModal').modal('toggle');
+                                ClearInputs();
+                                $("#notification").text(response.responseText);
+                                $('.toast').toast('show');
+                            }
+                        }
+                    });
+                }
+            });
+
+            $('#DeleteStudentRegistrationInfo').submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    async: false,
+                    url: '/api/studentRegistrationInfos/' + studentRegistrationInfoId,
+                    method: 'DELETE',
+                    statusCode: {
+                        404: function (response) {
+                            $('#deleteModal').modal('toggle');
+                            $("#notification").text(response);
+                            $('.toast').toast('show');
+                            ClearInputs();
+                        },
+                        500: function (response) {
+                            $('#deleteModal').modal('toggle');
+                            $("#notification").text(response);
+                            $('.toast').toast('show');
+                            ClearInputs();
+                        },
+                        202: function (response) {
+                            infoTable.row("#studentRegistrationInfo_" + studentRegistrationInfoId).remove().draw();
+                            $('#deleteModal').modal('toggle');
+                            console.log(response);
+                            $("#notification").text(response);
+                            $('.toast').toast('show');
+                            ClearInputs();
+                        }
+                    }
+                });
+            });
+
+            var years = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                remote: {
+                    url: '/api/years?query=%QUERY',
+                    wildcard: '%QUERY'
+                }
+            });
+
+            $('#yearName').typeahead({
+                minLength: 1,
+                highlight: true
+            }, {
+                name: 'year',
+                display: 'name',
+                limit: 20,
+                source: years
+            }).on("typeahead:select", function (e, year) {
+                $("#yearId").val(year.id);
+            });
+
+            // disable typeahead element that invalidate form
+            $(".twitter-typeahead > input[type='text']:eq(0)").remove();
+        });
+
+
+        var form = $('#manageStudentRegistrationInfos'),
+            origForm = form.serialize();
+
+        $('#manageStudentRegistrationInfos :input').on('change input',
+            function () {
+                if (form.serialize() !== origForm)
+                    $("#addBtn").removeAttr("disabled");
+                else
+                    $("#addBtn").attr("disabled", "disabled");
+
+                $("#errors").html("");
+            });
+
+        sandtrapValidation = {
+            getDependentElement: function (validationElement, dependentProperty) {
+                var dependentElement = $('#' + dependentProperty);
+                if (dependentElement.length === 1) {
+                    return dependentElement;
+                }
+                var name = validationElement.name;
+                var index = name.lastIndexOf(".") + 1;
+                var id = (name.substr(0, index) + dependentProperty).replace(/[\.\[\]]/g, "_");
+                dependentElement = $('#' + id);
+                if (dependentElement.length === 1) {
+                    return dependentElement;
+                }
+                // Try using the name attribute
+                name = (name.substr(0, index) + dependentProperty);
+                dependentElement = $('[name="' + name + '"]');
+                if (dependentElement.length > 0) {
+                    return dependentElement.first();
+                }
+                return null;
+            }
+        }
+
+        $(function () {
+            console.log("start big function");
+            jQuery.validator.addMethod('requiretypeahead', function (value, element, params) {
+                var isValid = true;
+                $.each(params.otherproperties, function (index, item) {
+                    if (($(this).val() == '') || ($(this).val() == '0') || ($(this).val() == 0)) {
+                        console.log($(this).val());
+                        isValid = false;
+                    }
+                });
+                return isValid;
+                /*//console.log("start validate");
+                if (!value) return false;
+                var minDate = new Date(params.min);
+                var maxDate = new Date(params.max);
+                minDate.setHours(0, 0, 0, 0);
+                maxDate.setHours(0, 0, 0, 0);
+                //console.log(params);
+                //minDate.setDate(parseInt(params.min));
+                //maxDate.setDate(parseInt(params.max));
+                console.log("min ", minDate);
+                console.log("max ", maxDate);
+                value = new Date(value);
+                value.setHours(0, 0, 0, 0);
+                console.log("val ", value);
+                console.log("---------------------");
+
+                return value >= minDate && value <= maxDate;*/
+            });
+
+            jQuery.validator.unobtrusive.adapters.add('requiretypeahead', ['otherproperties'], function (options) {
+                //console.log("start adapter");
+                var element = options.element;
+                var otherNames = options.params.otherproperties.split(',');
+                var otherProperties = [];
+                $.each(otherNames, function (index, item) {
+                    otherProperties.push(sandtrapValidation.getDependentElement(element, item))
+                });
+                options.rules['requiretypeahead'] = {
+                    otherproperties: otherProperties
+                };
+                options.messages['requiretypeahead'] = options.message;
+            });
+        }(jQuery));
+
+        $(function () {
+            jQuery.validator.addMethod('lessthandatetime', function (value, element, params) {
+                var isValid = true;
+                $.each(params.otherproperties, function (index, item) {
+                    if (new Date($(this).val()) >= new Date(value)) {
+                        console.log($(this).val());
+                        isValid = false;
+                    }
+                });
+                return isValid;
+                /*//console.log("start validate");
+                if (!value) return false;
+                var minDate = new Date(params.min);
+                var maxDate = new Date(params.max);
+                minDate.setHours(0, 0, 0, 0);
+                maxDate.setHours(0, 0, 0, 0);
+                //console.log(params);
+                //minDate.setDate(parseInt(params.min));
+                //maxDate.setDate(parseInt(params.max));
+                console.log("min ", minDate);
+                console.log("max ", maxDate);
+                value = new Date(value);
+                value.setHours(0, 0, 0, 0);
+                console.log("val ", value);
+                console.log("---------------------");
+
+                return value >= minDate && value <= maxDate;*/
+            });
+
+            jQuery.validator.unobtrusive.adapters.add('lessthandatetime', ['otherproperties'], function (options) {
+                //console.log("start adapter");
+                var element = options.element;
+                var otherNames = options.params.otherproperties.split(',');
+                var otherProperties = [];
+                $.each(otherNames, function (index, item) {
+                    otherProperties.push(sandtrapValidation.getDependentElement(element, item))
+                });
+                options.rules['lessthandatetime'] = {
+                    otherproperties: otherProperties
+                };
+                options.messages['lessthandatetime'] = options.message;
+            });
+        }(jQuery));
+
+    </script>
+}

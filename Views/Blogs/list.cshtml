@@ -1,0 +1,40 @@
+@model IEnumerable<KiddieParadies.Core.Models.Blog>
+@{
+    ViewData["Title"] = "الأخبار";
+}
+
+@foreach (var blog in Model)
+{
+    <div class="row">
+        <div class="col-md-10">
+            <div class="row">
+                <div class="row">
+                    @Html.ActionLink(blog.Title, "read", "news", routeValues: new { id = blog.Id }, htmlAttributes: new { @class="col-md-8" })
+                    @{
+                        var dateTime = blog.Time.ToString("ddd dd-MM-yyyy hh:mm tt");
+                        var amPm = dateTime.Substring(dateTime.Length - 2, 2);
+                        amPm = amPm == "AM" ? "ص" : "م";
+                        dateTime = dateTime.Substring(0, dateTime.Length - 2) + amPm;
+                        <span class="col-md-4">@dateTime</span>
+                    }
+                </div>
+                <div class="row">
+                    <span class="col-md-12">@blog.ShortContent</span>
+                </div>
+            </div>  
+        </div>
+        <div class="col-md-2">
+            @{
+                if (string.IsNullOrWhiteSpace(blog.MainImageName))
+                {
+                    <img src="~/Logo.png" style="height: 140px;" >
+                }
+                else
+                {
+                    <img src="/images/news/@blog.MainImageName" style="height: 140px;" >
+                }
+            }
+        </div>
+    </div>
+    <hr>
+}

@@ -1,0 +1,736 @@
+﻿@model KiddieParadies.Core.Models.Year
+
+@{
+    ViewData["Title"] = "الأعوام الدراسية";
+}
+
+@section styles
+{
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css">
+    <style>
+        section {
+            margin-bottom: 15px;
+            padding: 1%;
+        }
+
+        body section:first-of-type {
+            padding: 0px !important;
+        }
+
+        .fa-trash {
+            color: red;
+        }
+
+        .fa-edit {
+            color: #55FF1A;
+        }
+
+        .fas {
+            font-size: 21px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        a img {
+            height: 35px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            margin-top: 4em;
+        }
+
+        ::-webkit-scrollbar-track {
+            border-radius: 10px;
+            margin-top: 3.5em !important;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #FFFEB0;
+            border-radius: 10px;
+        }
+
+        .bg-light {
+            background-color: #FFFEB0 !important;
+        }
+
+        @@media only screen and (max-width: 760px) {
+            /* Force table to not be like tables anymore */
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+            }
+                /* Hide table headers (but not display: none;, for accessibility) */
+                thead tr {
+                    /*position: absolute;
+            top: -9999px;
+            left: -9999px;*/
+                    display: none;
+                }
+
+            tr {
+                border: 1px solid #ccc;
+            }
+
+            td {
+                /* Behave  like a "row" */
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-right: 50% !important;
+            }
+
+                td:before {
+                    /* Now like a table header */
+                    position: absolute;
+                    /* Top/left values mimic padding */
+                    top: 6px;
+                    right: 6px;
+                    width: 45%;
+                    padding-left: 10px;
+                    white-space: nowrap;
+                }
+                /*
+        Label the data
+        */
+
+                td:nth-of-type(1):before {
+                    content: "العام الدراسي";
+                }
+
+                td:nth-of-type(2):before {
+                    content: "من تاريخ";
+                }
+
+                td:nth-of-type(3):before {
+                    content: "حتى تاريخ";
+                }
+
+                td:nth-of-type(4):before {
+                    content: "إدارة";
+                }
+        }
+
+        .toast-container {
+            top: 55px !important;
+        }
+
+        .field-validation-error {
+            color: #F00;
+        }
+
+        .odd {
+            background-color: #F2F0FD;
+        }
+
+        td {
+            border: 1px solid white !important;
+        }
+
+        input {
+        direction: rtl !important;
+        text-align: right !important;
+        }
+    </style>
+}
+<section>
+    <button class="btn btn-primary" id="new" data-bs-toggle="modal" data-bs-target="#manageModal">
+        عام دراسي
+        جديد
+    </button>
+
+    <div class="toast-container position-fixed end-0 p-3" style="top: 60px !important;">
+
+        <div class="toast fade hide" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <img src="/Logo.png" style="width: 40px;" class="rounded me-2" alt="روضة السعادة">
+                <strong class="me-auto">روضة السعادة</strong>
+                <small class="text-muted">الآن</small>
+                <button type="button" id="toastBtn" class="btn-close" data-bs-dismiss="toast"
+                        aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="notification">
+                تمت إضافة العام الدراسي بنجاح.
+            </div>
+        </div>
+    </div>
+</section>
+<section class="table-responsive">
+    <table id="info" class="table align-middle display">
+        <thead>
+            <tr>
+                <th scope="col">العام الدراسي</th>
+                <th scope="col">من تاريخ</th>
+                <th scope="col">حتى تاريخ</th>
+                <th scope="col">إدارة</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</section>
+<div class="modal fade" id="manageModal" tabindex="-1" aria-labelledby="manageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="manageModalLabel">عام دراسي جديد</h5>
+                <button type="button" class="btn-close clear-data" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="errors" style="color: #F00;"></div>
+            @using (Html.BeginForm(method: FormMethod.Post, htmlAttributes: new { @id = "manageYears" }))
+            {
+                <div class="modal-body">
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.FromDate, new { @class = "col-form-label" })
+                        @Html.TextBoxFor(m => m.FromDate, new { @class = "form-control", @id = "fromDate", @type = "date" })
+                        @Html.ValidationMessageFor(m => m.FromDate)
+                    </div>
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.ToDate, new { @class = "col-form-label" })
+                        @Html.TextBoxFor(m => m.ToDate, new { @class = "form-control", @id = "toDate", @type = "date" })
+                        @Html.ValidationMessageFor(m => m.ToDate)
+                    </div>
+                </div>
+                @Html.HiddenFor(m => m.Id, new { @id = "yearId" })
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" id="addBtn">إضافة</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">حذف عام دراسي</h5>
+                <button type="button" class="btn-close clear-data" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="DeleteYear" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <p>هل أنت متأكد من أنك تريد حذف العام الدراسي?</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">نعم</button>
+                    <button type="button" class="btn btn-secondary clear-data" data-bs-dismiss="modal">لا</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
+
+    <script type="text/javascript">
+
+        function ToDisplayDate(dateTime) {
+            if (dateTime.includes("T"))
+                dateTime = dateTime.split('T')[0];
+
+            return dateTime;
+        }
+
+        function ToInputDate(date, field) {
+            field.val(date);
+            if (field.val() == '' || field.val() == null || field.val() == undefined) {
+                date = date.split("-");
+                date = date[2] + "-" + date[1] + "-" + date[0];
+                field.val(date);
+            }
+        }
+
+        function RenderInfoList(table, tryNumber = 0) {
+            $.ajax({
+                async: false,
+                url: '/api/years',
+                method: 'GET',
+                contentType: 'application/json',
+                dataType: 'json',
+                statusCode: {
+                    200: function (years) {
+                        for (var year of years) {
+                            table.row.add([
+                                year.name, ToDisplayDate(year.fromDate), ToDisplayDate(year.toDate),
+                                '<a href="#" class="edit-btn" data-id=' +
+                                year.id +
+                                '><i class="fas fa-edit"></i></a>' +
+                                '<a href="#" class="remove-btn" data-id=' +
+                                year.id +
+                                '><i class="fas fa-trash"></i></a>'
+                            ])
+                                .node().id = "year_" + year.id;
+                            table.draw(false);
+                        }
+                    },
+                    500: function () {
+                        if (tryNumber == 2)
+                            window.location.reload();
+                        else
+                            RenderInfoList(table, ++tryNumber);
+                    }
+                }
+            });
+        }
+
+        function ClearInputs() {
+            $('#fromDate').val('');
+            $('#toDate').val('');
+            $("#yearId").val(0);
+
+            yearId = null;
+
+            $("#addBtn").attr("disabled", "disabled");
+
+            // get the form inside we are working - change selector to your form as needed
+            var form = $("#manageYears");
+
+            // get validator object
+            var validator = form.validate();
+
+            // get errors that were created using jQuery.validate.unobtrusive
+            var errors = form.find(".field-validation-error span");
+
+            // trick unobtrusive to think the elements were succesfully validated
+            // this removes the validation messages
+            errors.each(function () { validator.settings.success($(this)); })
+
+            // clear errors from validation
+            validator.resetForm();
+        }
+
+        $(document).ready(function () {
+
+            $("input[type='date']").keydown(function (e) {
+                var keyCode = e.keyCode || e.which;
+
+                if (keyCode != 9)
+                    return false;
+            });
+
+            var infoTable = $('#info').DataTable({
+                "columnDefs": [
+                    { "type": "date-dd-MM-yyyy", targets: 1 },
+                    { "type": "date-dd-MM-yyyy", targets: 2 }
+                ],
+                "language": {
+                    "url": "https://cdn.datatables.net/plug-ins/1.11.4/i18n/ar.json"
+                }
+            });
+
+            RenderInfoList(infoTable);
+
+            // sort date
+            (function () {
+
+                var customDateDDMMMYYYYToOrd = function (date) {
+                    "use strict"; //let's avoid tom-foolery in this function
+                    // Convert to a number YYYYMMDD which we can use to order
+                    var dateParts = date.split(/-/);
+                    return (dateParts[2] * 10000) +
+                        ($.inArray(dateParts[1].toUpperCase(),
+                            ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]) *
+                            100) +
+                        (dateParts[0] * 1);
+                };
+
+                // This will help DataTables magic detect the "dd-MMM-yyyy" format; Unshift
+                // so that it's the first data type (so it takes priority over existing)
+                jQuery.fn.dataTableExt.aTypes.unshift(
+                    function (sData) {
+                        "use strict"; //let's avoid tom-foolery in this function
+                        if (/^([0-2]?\d|3[0-1])-(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)-\d{4}/i.test(sData)) {
+                            return 'date-dd-mmm-yyyy';
+                        }
+                        return null;
+                    }
+                );
+
+                // define the sorts
+                jQuery.fn.dataTableExt.oSort['date-dd-mmm-yyyy-asc'] = function (a, b) {
+                    "use strict"; //let's avoid tom-foolery in this function
+                    var ordA = customDateDDMMMYYYYToOrd(a),
+                        ordB = customDateDDMMMYYYYToOrd(b);
+                    return (ordA < ordB) ? -1 : ((ordA > ordB) ? 1 : 0);
+                };
+
+                jQuery.fn.dataTableExt.oSort['date-dd-mmm-yyyy-desc'] = function (a, b) {
+                    "use strict"; //let's avoid tom-foolery in this function
+                    var ordA = customDateDDMMMYYYYToOrd(a),
+                        ordB = customDateDDMMMYYYYToOrd(b);
+                    return (ordA < ordB) ? 1 : ((ordA > ordB) ? -1 : 0);
+                };
+
+            })();
+            // end sort date
+
+            $("#manageYears").on("blur",
+                "input",
+                () => {
+                    if ($("#manageYears").valid())
+                        $("#addBtn").removeAttr("disabled");
+                    else
+                        $("#addBtn").attr("disabled", "disabled");
+                });
+
+            $('.clear-data').on('click',
+                function () {
+                    ClearInputs();
+                });
+
+            $('#manageModal').on('shown.bs.modal',
+                function () {
+                    $('#fromDate').focus();
+                });
+
+            $('#manageModal').on('hidden.bs.modal',
+                function () {
+                    ClearInputs();
+                });
+
+            var yearId = null;
+
+            $("#info").on("click",
+                "a.edit-btn",
+                function (e) {
+                    e.preventDefault();
+                    yearId = $(this).attr('data-id');
+                    $("#yearId").val(yearId);
+                    var tableRow = $("#year_" + yearId);
+                    ToInputDate(tableRow.children().eq(1).text(), $('#fromDate'));
+                    ToInputDate(tableRow.children().eq(2).text(), $('#toDate'));
+                    $('#manageModal button[type="submit"]').text('حفظ التعديلات');
+                    $("#manageModalLabel").text("تعديل عام دراسي");
+                    $('#manageModal').modal('toggle');
+                });
+
+            $("#new").click(callback => {
+                $('#manageModal button[type="submit"]').text('إضافة');
+                $("#manageModalLabel").text("عام دراسي جديد");
+                ClearInputs();
+            });
+
+            $("#info").on("click",
+                "a.remove-btn",
+                function (e) {
+                    e.preventDefault();
+                    yearId = $(this).attr('data-id');
+                    $('#deleteModal').modal('toggle');
+                });
+
+            $('#manageYears').submit(function (e) {
+                e.preventDefault();
+
+                if ($('#manageModal button[type="submit"]').text() == "حفظ التعديلات") {
+                    $.ajax({
+                        async: false,
+                        url: '/api/years',
+                        method: 'PUT',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        data: JSON.stringify({
+                            Id: $('#yearId').val(),
+                            FromDate: new Date($('#fromDate').val()),
+                            ToDate: new Date($('#toDate').val())
+                        }),
+                        statusCode: {
+                            200: function (year) {
+                                var row = $("#year_" + yearId);
+                                row.find("td").eq(0).text(year.name);
+                                row.find("td").eq(1).text(ToDisplayDate(year.fromDate));
+                                row.find("td").eq(2).text(ToDisplayDate(year.toDate));
+                                $('#manageModal').modal('toggle');
+                                $("#notification").text("تم حفظ التعديلات على العام الدراسي بنجاح.");
+                                $('.toast').toast('show');
+                                ClearInputs();
+                            },
+                            400: function (response) {
+                                var errorList = "<p>يرجى إصلاح الأخطاء التالية</p><ul>";
+                                if (response.responseJSON != undefined)
+                                    for (var field in response.responseJSON) {
+                                        for (var error of response.responseJSON[field]) {
+                                            if (field.length > 2)
+                                                errorList += "<li>الحقل '" + field + "': " + error + "</li>";
+                                            else
+                                                errorList += "<li>" + error + "</li>";
+                                        }
+                                    }
+                                else
+                                    errorList += "<li>" + response.responseText + "</li>";
+                                errorList += "</ul>";
+                                $("#errors").html(errorList);
+                                $('#errors')[0].scrollIntoView({ behavior: 'smooth' });
+                                $("#addBtn").attr("disabled", "disabled");
+                            },
+                            500: function (response) {
+                                $('#manageModal').modal('toggle');
+                                ClearInputs();
+                                $("#notification").text(response.responseText);
+                                $('.toast').toast('show');
+                            }
+                        }
+                    });
+                } else if ($('#manageModal button[type="submit"]').text() == "إضافة") {
+                    $.ajax({
+                        async: false,
+                        url: '/api/years',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        data: JSON.stringify({
+                            Id: $('#yearId').val(),
+                            FromDate: new Date($('#fromDate').val()),
+                            ToDate: new Date($('#toDate').val())
+                        }),
+                        statusCode: {
+                            200: function (year) {
+                                infoTable.row.add([
+                                    year.name, ToDisplayDate(year.fromDate), ToDisplayDate(year.toDate),
+                                    '<a href="#" class="edit-btn" data-id=' +
+                                    year.id +
+                                    '><i class="fas fa-edit"></i></a>' +
+                                    '<a href="#" class="remove-btn" data-id=' +
+                                    year.id +
+                                    '><i class="fas fa-trash"></i></a>'
+                                ]).node().id = "year_" + year.id;
+                                infoTable.draw(false);
+                                $('#manageModal').modal('toggle');
+                                $("#notification").text("تمت إضافة العام الدراسي بنجاح.");
+                                $('.toast').toast('show');
+                                ClearInputs();
+                            },
+                            400: function (response) {
+                                var errorList = "<p>يرجى إصلاح الأخطاء التالية</p><ul>";
+                                if (response.responseJSON != undefined)
+                                    for (var field in response.responseJSON) {
+                                        for (var error of response.responseJSON[field]) {
+                                            if (field.length > 2)
+                                                errorList += "<li>الحقل '" + field + "': " + error + "</li>";
+                                            else
+                                                errorList += "<li>" + error + "</li>";
+                                        }
+                                    }
+                                else
+                                    errorList += "<li>" + response.responseText + "</li>";
+                                errorList += "</ul>";
+                                $("#errors").html(errorList);
+                                $('#errors')[0].scrollIntoView({ behavior: 'smooth' });
+                                $("#addBtn").attr("disabled", "disabled");
+                            },
+                            500: function (response) {
+                                $('#manageModal').modal('toggle');
+                                ClearInputs();
+                                $("#notification").text(response.responseText);
+                                $('.toast').toast('show');
+                            }
+                        }
+                    });
+                }
+            });
+
+            $('#DeleteYear').submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    async: false,
+                    url: '/api/years/' + yearId,
+                    method: 'DELETE',
+                    statusCode: {
+                        404: function (response) {
+                            $('#deleteModal').modal('toggle');
+                            $("#notification").text(response);
+                            $('.toast').toast('show');
+                            ClearInputs();
+                        },
+                        500: function (response) {
+                            $('#deleteModal').modal('toggle');
+                            $("#notification").text(response);
+                            $('.toast').toast('show');
+                            ClearInputs();
+                        },
+                        202: function (response) {
+                            infoTable.row("#year_" + yearId).remove().draw();
+                            $('#deleteModal').modal('toggle');
+                            console.log(response);
+                            $("#notification").text(response);
+                            $('.toast').toast('show');
+                            ClearInputs();
+                        }
+                    }
+                });
+            });
+
+            /*$.validator.unobtrusive.adapters.add("daterange",
+                ["min", "max"],
+                function (options) {
+                    if (options.params.min) {
+                        setValidationValues(options, "min", options.params.min);
+                    }
+                    if (options.params.max) {
+                        setValidationValues(options, "max", options.params.max);
+                    }
+                });
+            $.validator.addMethod("daterange",
+                function (value, element, params) {
+                    //var flag = (value >= parameters[0]) && (value <= parameters[1]);
+                    //console.log(flag);
+                    //return false;
+                    //return flag;
+                    console.log("start validate");
+                    if (!value) return false;
+                    var minDate = new Date();
+                    var maxDate = new Date();
+
+                    minDate.setDate(parseInt(params.min));
+                    maxDate.setDate(parseInt(params.max));
+
+                    return value >= minDate && value <= maxDate;
+                });*/
+
+
+            /*jQuery.validator.addMethod('dayRange', function (value, element, param) {
+                if (!value) return false;
+                var valueDateParts = value.split(param.seperator);
+                var minDate = new Date();
+                var maxDate = new Date();
+                var now = new Date();
+                var dateValue = new Date(valueDateParts[2],
+                    (valueDateParts[1] - 1),
+                    valueDateParts[0],
+                    now.getHours(),
+                    now.getMinutes(),
+                    (now.getSeconds() + 5));
+
+                minDate.setDate(minDate.getDate() - parseInt(param.min));
+                maxDate.setDate(maxDate.getDate() + parseInt(param.max));
+
+                return dateValue >= minDate && dateValue <= maxDate;
+            });*/
+
+        });
+
+
+        var form = $('#manageYears'),
+            origForm = form.serialize();
+
+        $('#manageYears :input').on('change input',
+            function () {
+                if (form.serialize() !== origForm)
+                    $("#addBtn").removeAttr("disabled");
+                else
+                    $("#addBtn").attr("disabled", "disabled");
+
+                $("#errors").html("");
+            });
+
+        $(function () {
+            console.log("start big function");
+            jQuery.validator.addMethod('daterange', function (value, element, params) {
+                //console.log("start validate");
+                if (!value) return false;
+                var minDate = new Date(params.min);
+                var maxDate = new Date(params.max);
+                minDate.setHours(0, 0, 0, 0);
+                maxDate.setHours(0, 0, 0, 0);
+                //console.log(params);
+                //minDate.setDate(parseInt(params.min));
+                //maxDate.setDate(parseInt(params.max));
+                console.log("min ", minDate);
+                console.log("max ", maxDate);
+                value = new Date(value);
+                value.setHours(0, 0, 0, 0);
+                console.log("val ", value);
+                console.log("---------------------");
+
+                return value >= minDate && value <= maxDate;
+            });
+
+            jQuery.validator.unobtrusive.adapters.add('daterange', ['min', 'max'], function (options) {
+                //console.log("start adapter");
+                var params = {
+                    min: options.params.min,
+                    max: options.params.max
+                };
+                //console.log(params);
+                options.rules['daterange'] = params;
+                if (options.message) {
+                    options.messages['daterange'] = options.message;
+                }
+            });
+        }(jQuery));
+
+         sandtrapValidation = {
+            getDependentElement: function (validationElement, dependentProperty) {
+                var dependentElement = $('#' + dependentProperty);
+                if (dependentElement.length === 1) {
+                    return dependentElement;
+                }
+                var name = validationElement.name;
+                var index = name.lastIndexOf(".") + 1;
+                var id = (name.substr(0, index) + dependentProperty).replace(/[\.\[\]]/g, "_");
+                dependentElement = $('#' + id);
+                if (dependentElement.length === 1) {
+                    return dependentElement;
+                }
+                // Try using the name attribute
+                name = (name.substr(0, index) + dependentProperty);
+                dependentElement = $('[name="' + name + '"]');
+                if (dependentElement.length > 0) {
+                    return dependentElement.first();
+                }
+                return null;
+            }
+        }
+
+        $(function () {
+            jQuery.validator.addMethod('lessthandatetime', function (value, element, params) {
+                var isValid = true;
+                $.each(params.otherproperties, function (index, item) {
+                    if (new Date($(this).val()) >= new Date(value)) {
+                        console.log($(this).val());
+                        isValid = false;
+                    }
+                });
+                return isValid;
+                /*//console.log("start validate");
+                if (!value) return false;
+                var minDate = new Date(params.min);
+                var maxDate = new Date(params.max);
+                minDate.setHours(0, 0, 0, 0);
+                maxDate.setHours(0, 0, 0, 0);
+                //console.log(params);
+                //minDate.setDate(parseInt(params.min));
+                //maxDate.setDate(parseInt(params.max));
+                console.log("min ", minDate);
+                console.log("max ", maxDate);
+                value = new Date(value);
+                value.setHours(0, 0, 0, 0);
+                console.log("val ", value);
+                console.log("---------------------");
+
+                return value >= minDate && value <= maxDate;*/
+            });
+
+            jQuery.validator.unobtrusive.adapters.add('lessthandatetime', ['otherproperties'], function (options) {
+                //console.log("start adapter");
+                var element = options.element;
+                var otherNames = options.params.otherproperties.split(',');
+                var otherProperties = [];
+                $.each(otherNames, function (index, item) {
+                    otherProperties.push(sandtrapValidation.getDependentElement(element, item))
+                });
+                options.rules['lessthandatetime'] = {
+                    otherproperties: otherProperties
+                };
+                options.messages['lessthandatetime'] = options.message;
+            });
+        }(jQuery));
+    </script>
+}

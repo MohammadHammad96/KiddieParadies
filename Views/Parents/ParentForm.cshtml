@@ -1,0 +1,79 @@
+@model KiddieParadies.ViewModels.ParentFormViewModel
+
+@section styles
+{
+    <style>
+        .field-validation-error {
+            color: #F00;
+        }
+    </style>
+}
+
+<div class="row">
+    <div id="errors" style="color: #F00;"></div>
+    @using (Html.BeginForm("Save", "Parents", FormMethod.Post, htmlAttributes: new { @id="parentForm", @enctype="multipart/form-data", @class="col-md-10 offset-md-1" }))
+    {
+        <div class="row">
+            <div class="col-md-6">
+                @Html.LabelFor(m => m.FatherName, new { @class = "col-form-label" })
+                @Html.TextBoxFor(m => m.FatherName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.FatherName)
+            </div>
+            <div class="col-md-6">
+                @Html.LabelFor(m => m.FatherLaseName, new { @class = "col-form-label" })
+                @Html.TextBoxFor(m => m.FatherLaseName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.FatherLaseName)
+            </div>
+            <div class="col-md-6">
+                @Html.LabelFor(m => m.MotherFullName, new { @class = "col-form-label" })
+                @Html.TextBoxFor(m => m.MotherFullName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.MotherFullName)
+            </div>
+            <div class="col-md-6">
+                @Html.LabelFor(m => m.FatherIdentityImage, new { @class = "col-form-label" })
+                @Html.TextBoxFor(m => m.FatherIdentityImage, htmlAttributes: new { @type="file", @class="form-control", @accept="image/png, image/jpg, image/jpeg" })
+                @Html.ValidationMessageFor(m => m.FatherIdentityImage)
+            </div>
+            <div class="col-md-6">
+                @Html.LabelFor(m => m.MotherIdentityImage, new { @class = "col-form-label" })
+                @Html.TextBoxFor(m => m.MotherIdentityImage, htmlAttributes: new { @type="file", @class="form-control", @accept="image/png, image/jpg, image/jpeg" })
+                @Html.ValidationMessageFor(m => m.MotherIdentityImage)
+            </div>
+        </div>
+        
+        @Html.HiddenFor(m => m.Id)
+        @Html.HiddenFor(m => m.UserId)
+        <input type="submit" class="btn btn-primary" value="حفظ" id="saveBtn" />
+    }
+</div>
+
+@section scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            $("#saveBtn").attr("disabled", "disabled");
+
+            $("#parentForm").on("blur",
+                "input",
+                () => {
+                    if ($("#parentForm").valid())
+                        $("#saveBtn").removeAttr("disabled");
+                    else
+                        $("#saveBtn").attr("disabled", "disabled");
+            });
+
+            var form = $('#parentForm'), origForm = form.serialize();
+            $('#parentForm :input').on('change input',
+                function () {
+                    if (form.serialize() !== origForm)
+                        $("#saveBtn").removeAttr("disabled");
+                    else
+                        $("#saveBtn").attr("disabled", "disabled");
+
+                    $("#errors").html("");
+                });
+        });
+    </script>
+}

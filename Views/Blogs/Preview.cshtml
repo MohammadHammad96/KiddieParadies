@@ -1,0 +1,15 @@
+@model KiddieParadies.Core.Models.Blog
+@{
+    ViewData["Title"] = Model.Title;
+}
+<div class="row">
+    <h4 style="color: #A0F;" class="col-lg-8 offset-lg-1 col-md-8 col-sm-12">@Model.Title</h4>
+    @{
+        var dateTime = Model.Time.ToString("ddd dd-MM-yyyy hh:mm tt");
+        var amPm = dateTime.Substring(dateTime.Length - 2, 2);
+        amPm = amPm == "AM" ? "ص" : "م";
+        dateTime = dateTime.Substring(0, dateTime.Length - 2) + amPm;
+        <span class="col-lg-3 col-md-4 col-sm-12">@dateTime</span>
+    }
+    <div class="col-lg-10 offset-lg-1 col-sm-12">@Html.Raw(Model.Content)</div>
+</div>

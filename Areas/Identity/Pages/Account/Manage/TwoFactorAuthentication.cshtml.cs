@@ -1,4 +1,5 @@
 using KiddieParadies.Core.Models;
+using KiddieParadies.Core.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,15 +15,17 @@ namespace KiddieParadies.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<TwoFactorAuthenticationModel> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
         public TwoFactorAuthenticationModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            ILogger<TwoFactorAuthenticationModel> logger)
+            ILogger<TwoFactorAuthenticationModel> logger, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         public bool HasAuthenticator { get; set; }
@@ -62,6 +65,11 @@ namespace KiddieParadies.Areas.Identity.Pages.Account.Manage
             }
 
             await _signInManager.ForgetTwoFactorClientAsync();
+            if (await _unitOfWork.SaveChangesAsync() <= 0)
+            {
+                ModelState.AddModelError(string.Empty, "íæÌÏ ÎØÃ ÈÇáãÎÏã¡ íÑÌì ÇáãÍÇæáÉ áÇÍÞÇð");
+                return Page();
+            }
             StatusMessage = "The current browser has been forgotten. When you login again from this browser you will be prompted for your 2fa code.";
             return RedirectToPage();
         }

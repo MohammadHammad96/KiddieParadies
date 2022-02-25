@@ -1,5 +1,5 @@
 using KiddieParadies.Core.Models;
-using KiddieParadies.Services;
+using KiddieParadies.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

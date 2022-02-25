@@ -21,17 +21,19 @@ namespace KiddieParadies.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailService _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
         public ExternalLoginModel(
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager,
             ILogger<ExternalLoginModel> logger,
-            IEmailService emailSender)
+            IEmailService emailSender, IUnitOfWork unitOfWork)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
             _emailSender = emailSender;
+            _unitOfWork = unitOfWork;
         }
 
         [BindProperty]
@@ -83,6 +85,11 @@ namespace KiddieParadies.Areas.Identity.Pages.Account
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
+                if (await _unitOfWork.SaveChangesAsync() <= 0)
+                {
+                    ModelState.AddModelError(string.Empty, "يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً");
+                    return Page();
+                }
                 _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
                 return LocalRedirect(returnUrl);
             }
@@ -144,11 +151,20 @@ namespace KiddieParadies.Areas.Identity.Pages.Account
                         // If account confirmation is required, we need to show the link if we don't have a real email sender
                         if (_userManager.Options.SignIn.RequireConfirmedAccount)
                         {
+                            if (await _unitOfWork.SaveChangesAsync() <= 0)
+                            {
+                                ModelState.AddModelError(string.Empty, "يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً");
+                                return Page();
+                            }
                             return RedirectToPage("./RegisterConfirmation", new { Email = Input.Email });
                         }
 
                         await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
-
+                        if (await _unitOfWork.SaveChangesAsync() <= 0)
+                        {
+                            ModelState.AddModelError(string.Empty, "يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً");
+                            return Page();
+                        }
                         return LocalRedirect(returnUrl);
                     }
                 }

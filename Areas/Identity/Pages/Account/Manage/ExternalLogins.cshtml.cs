@@ -1,4 +1,5 @@
 using KiddieParadies.Core.Models;
+using KiddieParadies.Core.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,13 +15,15 @@ namespace KiddieParadies.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IUnitOfWork _unitOfWork;
 
         public ExternalLoginsModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _unitOfWork = unitOfWork;
         }
 
         public IList<UserLoginInfo> CurrentLogins { get; set; }
@@ -64,6 +67,11 @@ namespace KiddieParadies.Areas.Identity.Pages.Account.Manage
             }
 
             await _signInManager.RefreshSignInAsync(user);
+            if (await _unitOfWork.SaveChangesAsync() <= 0)
+            {
+                ModelState.AddModelError(string.Empty, "íæÌÏ ÎØÃ ÈÇáãÎÏã¡ íÑÌì ÇáãÍÇæáÉ áÇÍÞÇð");
+                return Page();
+            }
             StatusMessage = "The external login was removed.";
             return RedirectToPage();
         }
@@ -102,6 +110,11 @@ namespace KiddieParadies.Areas.Identity.Pages.Account.Manage
 
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+            if (await _unitOfWork.SaveChangesAsync() <= 0)
+            {
+                ModelState.AddModelError(string.Empty, "íæÌÏ ÎØÃ ÈÇáãÎÏã¡ íÑÌì ÇáãÍÇæáÉ áÇÍÞÇð");
+                return Page();
+            }
 
             StatusMessage = "The external login was added.";
             return RedirectToPage();

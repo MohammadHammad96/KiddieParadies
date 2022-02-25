@@ -1,4 +1,5 @@
 using KiddieParadies.Core.Models;
+using KiddieParadies.Core.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -12,15 +13,17 @@ namespace KiddieParadies.Areas.Identity.Pages.Account.Manage
         UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         ILogger<ResetAuthenticatorModel> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
         public ResetAuthenticatorModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            ILogger<ResetAuthenticatorModel> logger)
+            ILogger<ResetAuthenticatorModel> logger, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         [TempData]
@@ -50,6 +53,11 @@ namespace KiddieParadies.Areas.Identity.Pages.Account.Manage
             _logger.LogInformation("User with ID '{UserId}' has reset their authentication app key.", user.Id);
 
             await _signInManager.RefreshSignInAsync(user);
+            if (await _unitOfWork.SaveChangesAsync() <= 0)
+            {
+                ModelState.AddModelError(string.Empty, "íæÌÏ ÎØÃ ÈÇáãÎÏã¡ íÑÌì ÇáãÍÇæáÉ áÇÍÞÇð");
+                return Page();
+            }
             StatusMessage = "Your authenticator app key has been reset, you will need to configure your authenticator app using the new key.";
 
             return RedirectToPage("./EnableAuthenticator");

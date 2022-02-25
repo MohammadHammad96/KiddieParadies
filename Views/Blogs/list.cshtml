@@ -1,6 +1,20 @@
+@using System.Globalization
 @model IEnumerable<KiddieParadies.Core.Models.Blog>
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration _configuration
 @{
     ViewData["Title"] = "الأخبار";
+}
+
+@section metaTags
+{
+    <meta property="og:image" content="@($"{Context.Request.Scheme}://{Context.Request.Host}/Logo.png")" />
+
+    <meta property="og:description" content="الأخبار" />
+    <meta property="og:url" content="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")" />
+    <meta property="og:title" content="روضة السعادة" />
+    <meta property="fb:app_id" content="@_configuration["Authentication:Facebook:AppId"]" />
+    <meta property="og:type" content="article" />
 }
 
 @foreach (var blog in Model)
@@ -9,29 +23,27 @@
         <div class="col-md-10">
             <div class="row">
                 <div class="row">
-                    @Html.ActionLink(blog.Title, "read", "news", routeValues: new { id = blog.Id }, htmlAttributes: new { @class="col-md-8" })
-                    @{
-                        var dateTime = blog.Time.ToString("ddd dd-MM-yyyy hh:mm tt");
-                        var amPm = dateTime.Substring(dateTime.Length - 2, 2);
-                        amPm = amPm == "AM" ? "ص" : "م";
-                        dateTime = dateTime.Substring(0, dateTime.Length - 2) + amPm;
-                        <span class="col-md-4">@dateTime</span>
-                    }
+                    @Html.ActionLink(blog.Title, "read", "news", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-8" })
+                    <span class="col-lg-3 col-md-4 col-sm-12">@blog.Time.ToString("ddd dd-MM-yyyy hh:mm tt", new CultureInfo("ar"))</span>
                 </div>
                 <div class="row">
                     <span class="col-md-12">@blog.ShortContent</span>
                 </div>
-            </div>  
+                <div class="row">
+                    @Html.ActionLink("تعديل", "edit", "news", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-1 offset-md-10 col-sm-2 offset-sm-8" })
+                    @Html.ActionLink("حذف", "delete", "news", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-1 col-sm-2" })
+                </div>
+            </div>
         </div>
         <div class="col-md-2">
             @{
                 if (string.IsNullOrWhiteSpace(blog.MainImageName))
                 {
-                    <img src="~/Logo.png" style="height: 140px;" >
+                    <img src="~/Logo.png" style="height: 140px;">
                 }
                 else
                 {
-                    <img src="/images/news/@blog.MainImageName" style="height: 140px;" >
+                    <img src="/images/news/@blog.MainImageName" style="height: 140px;">
                 }
             }
         </div>

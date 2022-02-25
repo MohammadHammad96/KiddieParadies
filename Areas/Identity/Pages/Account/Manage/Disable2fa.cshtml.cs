@@ -1,4 +1,5 @@
 using KiddieParadies.Core.Models;
+using KiddieParadies.Core.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -12,13 +13,15 @@ namespace KiddieParadies.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<Disable2FaModel> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
         public Disable2FaModel(
             UserManager<ApplicationUser> userManager,
-            ILogger<Disable2FaModel> logger)
+            ILogger<Disable2FaModel> logger, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         [TempData]
@@ -52,6 +55,11 @@ namespace KiddieParadies.Areas.Identity.Pages.Account.Manage
             if (!disable2FaResult.Succeeded)
             {
                 throw new InvalidOperationException($"Unexpected error occurred disabling 2FA for user with ID '{_userManager.GetUserId(User)}'.");
+            }
+            if (await _unitOfWork.SaveChangesAsync() <= 0)
+            {
+                ModelState.AddModelError(string.Empty, "íæÌÏ ÎØÃ ÈÇáãÎÏã¡ íÑÌì ÇáãÍÇæáÉ áÇÍÞÇð");
+                return Page();
             }
 
             _logger.LogInformation("User with ID '{UserId}' has disabled 2fa.", _userManager.GetUserId(User));

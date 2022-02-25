@@ -1,22 +1,18 @@
-using System;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using AutoMapper;
-using KiddieParadies.Areas.Identity.Pages.Account;
 using KiddieParadies.Core.Models;
 using KiddieParadies.Core.Services;
 using KiddieParadies.Extensions;
 using KiddieParadies.Helpers;
-using KiddieParadies.Services;
 using KiddieParadies.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace KiddieParadies.Controllers
 {
@@ -51,11 +47,11 @@ namespace KiddieParadies.Controllers
             var userRoles = await _userManager.GetRolesAsync(_loggedUser);
             if (userRoles.Where(r => r == "Admin").Count() == 0 && userRoles.Count > 0)
                 return View("NotFound");
-            
+
             var viewModel = new ParentFormViewModel();
             // if ((await _userManager.GetRolesAsync(_loggedUser)).Count == 0)
             //     viewModel.UserId = _loggedUser.Id;
-            
+
             if (neededUserId != null)
             {
                 if (userRoles.Count == 0)
@@ -63,11 +59,11 @@ namespace KiddieParadies.Controllers
                     viewModel.UserId = _loggedUser.Id;
                     return View("ParentForm", viewModel);
                 }
-                
+
                 var user = await _userManager.FindByIdAsync(neededUserId.ToString());
                 if (user == null)
                     return View("NotFound");
-                
+
                 viewModel.UserId = user.Id;
             }
             else
@@ -86,14 +82,14 @@ namespace KiddieParadies.Controllers
         {
             if (viewModel == null)
             {
-                ModelState.AddModelError(viewModel.GetPropertyDisplayName(v => v.FatherName), 
+                ModelState.AddModelError(viewModel.GetPropertyDisplayName(v => v.FatherName),
                     "يوجد خطأ بالمدخلات");
                 return View("ParentForm", viewModel);
             }
 
             if (!ModelState.IsValid)
                 return View("ParentForm", viewModel);
-            
+
             var userRoles = await _userManager.GetRolesAsync(_loggedUser);
             string[] acceptedFileTypes = new string[] { ".jpg", ".jpeg", ".png" };
             var imageExtension = string.Empty;
@@ -102,13 +98,13 @@ namespace KiddieParadies.Controllers
             {
                 if (viewModel.FatherIdentityImage == null || viewModel.FatherIdentityImage.Length == 0)
                 {
-                    ModelState.AddModelError("FatherIdentityImage", 
+                    ModelState.AddModelError("FatherIdentityImage",
                         "صورة صفحة الأب بدفتر العائلة إجبارية");
                     return View("ParentForm", viewModel);
                 }
                 if (viewModel.MotherIdentityImage == null || viewModel.MotherIdentityImage.Length == 0)
                 {
-                    ModelState.AddModelError("MotherIdentityImage", 
+                    ModelState.AddModelError("MotherIdentityImage",
                         "صورة صفحة الأم بدفتر العائلة إجبارية");
                     return View("ParentForm", viewModel);
                 }
@@ -155,7 +151,7 @@ namespace KiddieParadies.Controllers
                         {
                             await viewModel.MotherIdentityImage.CopyToAsync(stream);
                         }
-                        parent.MotherIdentityImagePath= motherFileName;
+                        parent.MotherIdentityImagePath = motherFileName;
 
                         await _parentRepository.AddAsync(parent);
                         if (!userRoles.Any(r => r == "Admin"))
@@ -163,11 +159,11 @@ namespace KiddieParadies.Controllers
                         if (await _unitOfWork.SaveChangesAsync() <= 0)
                         {
                             parent.FatherIdentityImagePath = Path
-                                .Combine(_host.ContentRootPath + "\\wwwroot", "images", "parentsIdentity", 
+                                .Combine(_host.ContentRootPath + "\\wwwroot", "images", "parentsIdentity",
                                 parent.FatherIdentityImagePath);
                             System.IO.File.Delete(parent.FatherIdentityImagePath);
                             parent.MotherIdentityImagePath = Path
-                                .Combine(_host.ContentRootPath + "\\wwwroot", "images", "parentsIdentity", 
+                                .Combine(_host.ContentRootPath + "\\wwwroot", "images", "parentsIdentity",
                                 parent.MotherIdentityImagePath);
                             System.IO.File.Delete(parent.MotherIdentityImagePath);
                             ModelState.AddModelError("FatherName", "يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً");
@@ -200,13 +196,13 @@ namespace KiddieParadies.Controllers
                     return View("ParentForm", viewModel);
                 }
             }
-            
+
 
             var parentToUpdate = await _parentRepository.GetByIdAsync(viewModel.Id);
             if (parentToUpdate == null)
                 return View("NotFound");
-            
-            if (userRoles.Any(r => r == "Admin") 
+
+            if (userRoles.Any(r => r == "Admin")
                 || (userRoles.Any(r => r == "Parent") && (_loggedUser.Id == viewModel.UserId)))
             {
                 var previousFatherImageName = parentToUpdate.FatherIdentityImagePath;
@@ -224,7 +220,7 @@ namespace KiddieParadies.Controllers
                     {
                         await viewModel.FatherIdentityImage.CopyToAsync(stream);
                     }
-                    parentToUpdate.FatherIdentityImagePath= fatherFileName;
+                    parentToUpdate.FatherIdentityImagePath = fatherFileName;
                 }
                 if (viewModel.MotherIdentityImage != null && viewModel.MotherIdentityImage.Length != 0)
                 {
@@ -240,11 +236,11 @@ namespace KiddieParadies.Controllers
                 if (await _unitOfWork.SaveChangesAsync() <= 0)
                 {
                     parentToUpdate.FatherIdentityImagePath = Path
-                        .Combine(_host.ContentRootPath + "\\wwwroot", "images", "parentsIdentity", 
+                        .Combine(_host.ContentRootPath + "\\wwwroot", "images", "parentsIdentity",
                         parentToUpdate.FatherIdentityImagePath);
                     System.IO.File.Delete(parentToUpdate.FatherIdentityImagePath);
                     parentToUpdate.MotherIdentityImagePath = Path
-                        .Combine(_host.ContentRootPath + "\\wwwroot", "images", "parentsIdentity", 
+                        .Combine(_host.ContentRootPath + "\\wwwroot", "images", "parentsIdentity",
                         parentToUpdate.MotherIdentityImagePath);
                     System.IO.File.Delete(parentToUpdate.MotherIdentityImagePath);
                     ModelState.AddModelError("FatherName", "يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً");
@@ -254,21 +250,21 @@ namespace KiddieParadies.Controllers
                 if (viewModel.FatherIdentityImage != null && viewModel.FatherIdentityImage.Length != 0)
                 {
                     previousFatherImageName = Path
-                        .Combine(_host.ContentRootPath + "\\wwwroot", "images", "parentsIdentity", 
+                        .Combine(_host.ContentRootPath + "\\wwwroot", "images", "parentsIdentity",
                         previousFatherImageName);
                     System.IO.File.Delete(previousFatherImageName);
                 }
                 if (viewModel.MotherIdentityImage != null && viewModel.MotherIdentityImage.Length != 0)
                 {
                     previousMotherImageName = Path
-                        .Combine(_host.ContentRootPath + "\\wwwroot", "images", "parentsIdentity", 
+                        .Combine(_host.ContentRootPath + "\\wwwroot", "images", "parentsIdentity",
                         previousMotherImageName);
                     System.IO.File.Delete(previousMotherImageName);
                 }
-                
+
                 return RedirectToAction("New");
             }
-            
+
             return View("NotFound");
         }
 
@@ -292,7 +288,7 @@ namespace KiddieParadies.Controllers
                 var parent = await _parentRepository.GetByIdAsync(id);
                 if (parent == null)
                     return View("NotFound");
-                
+
                 if (_loggedUser.Id == parent.UserId)
                 {
                     var viewModel = _mapper.Map<ParentFormViewModel>(parent);
@@ -305,7 +301,7 @@ namespace KiddieParadies.Controllers
 
             return View("NotFound");
         }
-    
+
         [HttpGet("preview/{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {

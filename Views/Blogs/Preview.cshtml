@@ -1,15 +1,63 @@
+@using System.Globalization
 @model KiddieParadies.Core.Models.Blog
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration _configuration
 @{
     ViewData["Title"] = Model.Title;
+}
+
+@section metaTags
+{
+    @if (String.IsNullOrWhiteSpace(Model.MainImageName))
+    {
+        <meta property="og:image" content="@($"{Context.Request.Scheme}://{Context.Request.Host}/Logo.png")" />
+    }
+    else
+    {
+        <meta property="og:image" content="@($"{Context.Request.Scheme}://{Context.Request.Host}/images/news/{Model.MainImageName}")" />
+    }
+
+    <meta property="og:description" content="@Model.Title" />
+    <meta property="og:url" content="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")" />
+    <meta property="og:title" content="روضة السعادة" />
+    <meta property="fb:app_id" content="@_configuration["Authentication:Facebook:AppId"]" />
+    <meta property="og:type" content="article" />
+    <meta property='article:published_time' content='@Model.Time' />
 }
 <div class="row">
     <h4 style="color: #A0F;" class="col-lg-8 offset-lg-1 col-md-8 col-sm-12">@Model.Title</h4>
     @{
-        var dateTime = Model.Time.ToString("ddd dd-MM-yyyy hh:mm tt");
-        var amPm = dateTime.Substring(dateTime.Length - 2, 2);
-        amPm = amPm == "AM" ? "ص" : "م";
-        dateTime = dateTime.Substring(0, dateTime.Length - 2) + amPm;
-        <span class="col-lg-3 col-md-4 col-sm-12">@dateTime</span>
+        //var dateTime = Model.Time.ToString("ddd dd-MM-yyyy hh:mm tt");
+        //var amPm = dateTime.Substring(dateTime.Length - 2, 2);
+        //amPm = amPm == "AM" ? "ص" : "م";
+        //dateTime = dateTime.Substring(0, dateTime.Length - 2) + amPm;
+        //switch (dateTime.Split(" ")[0].ToLower())
+        //{
+        //    case "sat" :
+        //        dateTime = "السبت" + dateTime.Substring(3, dateTime.Length - 3);
+        //        break;
+        //    case "sun" :
+        //        dateTime = "الأحد" + dateTime.Substring(3, dateTime.Length - 3);
+        //        break;
+        //    case "mon" :
+        //        dateTime = "الاثنين" + dateTime.Substring(3, dateTime.Length - 3);
+        //        break;
+        //    case "tue" :
+        //        dateTime = "الثلاثاء" + dateTime.Substring(3, dateTime.Length - 3);
+        //        break;
+        //    case "wed" :
+        //        dateTime = "الأربعاء" + dateTime.Substring(3, dateTime.Length - 3);
+        //        break;
+        //    case "thu" :
+        //        dateTime = "الخميس" + dateTime.Substring(3, dateTime.Length - 3);
+        //        break;
+        //    case "fri" :
+        //        dateTime = "الجمعة" + dateTime.Substring(3, dateTime.Length - 3);
+        //        break;
+        //}
+        //dateTime.Split(" ")[0]
+        @*<span class="col-lg-3 col-md-4 col-sm-12">@dateTime</span>*@
+        <span class="col-lg-3 col-md-4 col-sm-12">@Model.Time.ToString("ddd dd-MM-yyyy hh:mm tt", new CultureInfo("ar"))</span>
     }
     <div class="col-lg-10 offset-lg-1 col-sm-12">@Html.Raw(Model.Content)</div>
 </div>

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace KiddieParadies.CustomValidations
 {
@@ -15,8 +16,16 @@ namespace KiddieParadies.CustomValidations
 
         public DateRangeAttribute(string min, string max)
         {
-            _min = DateTime.Parse(min);
-            _max = DateTime.Parse(max);
+            var minData = min.Split("/");
+            var minInt = new List<int>();
+            foreach (var data in minData)
+                minInt.Add(int.Parse(data));
+            _min = new DateTime(minInt[2], minInt[1], minInt[0]);
+            var maxData = max.Split("/");
+            var maxInt = new List<int>();
+            foreach (var data in maxData)
+                maxInt.Add(int.Parse(data));
+            _max = new DateTime(maxInt[2], maxInt[1], maxInt[0]);
         }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)

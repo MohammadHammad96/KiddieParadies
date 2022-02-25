@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <_PublishTargetUrl>C:\Users\SVU\Desktop\TestBeforeExam</_PublishTargetUrl>
+    <History>True|2022-02-21T10:38:51.6231165Z;True|2022-02-17T01:20:54.7505176+02:00;</History>
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="SomeeConnection">
+      <Value>workstation id=KiddeParadis.mssql.somee.com%3bpacket size=4096%3buser id=Waseli_SQLLogin_1%3bpwd=o2zev888xb%3bdata source=KiddeParadis.mssql.somee.com%3bpersist security info=False%3binitial catalog=KiddeParadis</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+  <ItemGroup>
+    <EFMigrations Include="KiddieParadies.Data.ApplicationDbContext">
+      <Value>workstation id=KiddeParadis.mssql.somee.com%3bpacket size=4096%3buser id=Waseli_SQLLogin_1%3bpwd=o2zev888xb%3bdata source=KiddeParadis.mssql.somee.com%3bpersist security info=False%3binitial catalog=KiddeParadis</Value>
+    </EFMigrations>
+  </ItemGroup>
+</Project>

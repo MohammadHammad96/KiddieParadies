@@ -4,7 +4,6 @@ using KiddieParadies.Core.Models;
 using KiddieParadies.Core.Services;
 using KiddieParadies.Extensions;
 using KiddieParadies.Helpers;
-using KiddieParadies.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;

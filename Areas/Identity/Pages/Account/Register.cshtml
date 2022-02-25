@@ -9,15 +9,8 @@
     <style>
         .fa-google {
             font-size: 3rem;
-            background: 
-                linear-gradient(to bottom left, transparent 49%,#ea4335 50%) 105% 0%  /37% 30%,
-                linear-gradient(to bottom right,transparent 49%,#fbbc05 50%) 64% 100% /35% 43%,
-                
-                radial-gradient(farthest-side, #4285f4 46%,transparent 47%),
-                linear-gradient( 47deg,        #34a853 42%,transparent 43%),
-                linear-gradient(-72deg,        #fbbc05 42%,transparent 43%),
-                linear-gradient(-199deg,       #ea4335 42%,transparent 43%);
-            background-repeat:no-repeat;
+            background: linear-gradient(to bottom left, transparent 49%,#ea4335 50%) 105% 0% /37% 30%, linear-gradient(to bottom right,transparent 49%,#fbbc05 50%) 64% 100% /35% 43%, radial-gradient(farthest-side, #4285f4 46%,transparent 47%), linear-gradient( 47deg, #34a853 42%,transparent 43%), linear-gradient(-72deg, #fbbc05 42%,transparent 43%), linear-gradient(-199deg, #ea4335 42%,transparent 43%);
+            background-repeat: no-repeat;
             color: transparent;
             -webkit-background-clip: text;
             background-clip: text;
@@ -75,16 +68,16 @@
                     <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
                         <div>
                             <p>
-                                <button type="submit" class="btn" name="provider" value="Facebook" >
-                                    <i class='fab fa-facebook fa-3x' style="color: blue;"></i>
+                                <button type="submit" class="btn" name="provider" value="Facebook">
+                                    <i class='fab fa-facebook fa-2x' style="color: blue;"></i>
                                 </button>
-                                <button type="submit" class="btn" name="provider" value="Google" >
+                                <button type="submit" class="btn" name="provider" value="Google">
                                     <i class='fab fa-google fa-2x'></i>
                                 </button>
                                 @* @foreach (var provider in Model.ExternalLogins)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                } *@
+                                    {
+                                        <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                                    } *@
                             </p>
                         </div>
                     </form>
@@ -98,17 +91,17 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        $(document).ready(function() {
-            $("#show_hide_password a").on('click', function(event) {
+        $(document).ready(function () {
+            $("#show_hide_password a").on('click', function (event) {
                 event.preventDefault();
-                if($('#show_hide_password input').attr("type") == "text"){
+                if ($('#show_hide_password input').attr("type") == "text") {
                     $('.passwordDisplay').attr('type', 'password');
-                    $('#show_hide_password i').addClass( "fa-eye-slash" );
-                    $('#show_hide_password i').removeClass( "fa-eye" );
-                }else if($('#show_hide_password input').attr("type") == "password"){
+                    $('#show_hide_password i').addClass("fa-eye-slash");
+                    $('#show_hide_password i').removeClass("fa-eye");
+                } else if ($('#show_hide_password input').attr("type") == "password") {
                     $('.passwordDisplay').attr('type', 'text');
-                    $('#show_hide_password i').removeClass( "fa-eye-slash" );
-                    $('#show_hide_password i').addClass( "fa-eye" );
+                    $('#show_hide_password i').removeClass("fa-eye-slash");
+                    $('#show_hide_password i').addClass("fa-eye");
                 }
             });
         });

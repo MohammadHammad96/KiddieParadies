@@ -1,12 +1,9 @@
-using System.Collections;
-using System;
 using AutoMapper;
 using KiddieParadies.Controllers.Apis.Dtos;
 using KiddieParadies.Core.Models;
 using KiddieParadies.Core.Services;
 using KiddieParadies.Extensions;
 using KiddieParadies.Helpers;
-using KiddieParadies.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -38,7 +35,7 @@ namespace KiddieParadies.Controllers.Apis
             if (string.IsNullOrWhiteSpace(query))
                 years = await _yearRepository.GetAsync();
             else
-                years = await _yearRepository.GetAsync(y => y.Name.Contains(query), 
+                years = await _yearRepository.GetAsync(y => y.Name.Contains(query),
                     qy => qy.OrderByDescending(y => y.Name));
 
             return Ok(years);
@@ -130,7 +127,7 @@ namespace KiddieParadies.Controllers.Apis
         {
             if (dto == null)
                 return StatusCode(StatusCodes.Status400BadRequest, "يوجد خطأ بالمدخلات.");
-            
+
             dto.Name = string.Concat(dto.ToDate.Year, "/", dto.FromDate.Year);
             if (!ModelState.IsValid)
             {

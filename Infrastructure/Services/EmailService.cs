@@ -6,7 +6,7 @@ using MimeKit;
 using System;
 using System.Threading.Tasks;
 
-namespace KiddieParadies.Services
+namespace KiddieParadies.Infrastructure.Services
 {
     public class EmailService : IEmailService
     {

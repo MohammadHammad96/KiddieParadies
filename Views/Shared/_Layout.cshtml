@@ -58,12 +58,15 @@
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            الأخبار
+                                الأخبار
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                 <li><a class="dropdown-item" asp-controller="Blogs" asp-action="List">آخر الأخبار</a></li>
                                 <li><a class="dropdown-item" asp-controller="Blogs" asp-action="New">خبر جديد</a></li>
                             </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Parents" asp-action="New">تسجيل بيانات أولياء الأمور</a>
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />
@@ -94,7 +97,7 @@
     @await RenderSectionAsync("Scripts", required: false)
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // When the user scrolls down 20px from the top of the document, show the button
             window.onscroll = function () {
                 if (document.body.scrollTop > 20 ||
@@ -112,6 +115,10 @@
                     document.body.scrollTop = 0;
                     document.documentElement.scrollTop = 0;
                 });
+
+            if (document.domain.includes("somee")) {
+                $("center").last().remove();
+            }
         });
     </script>
 </body>

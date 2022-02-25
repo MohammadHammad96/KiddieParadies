@@ -1,22 +1,20 @@
-using System.Collections.Generic;
-using System;
-using System.Text;
-using System.Threading.Tasks;
 using AutoMapper;
 using KiddieParadies.Core.Models;
 using KiddieParadies.Core.Services;
-using KiddieParadies.Services;
-using Microsoft.AspNetCore.Mvc;
-using KiddieParadies.ViewModels;
-using Microsoft.AspNetCore.Http;
-using KiddieParadies.Helpers;
-using System.Linq;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.IO;
 using KiddieParadies.Extensions;
+using KiddieParadies.Helpers;
+using KiddieParadies.ViewModels;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace KiddieParadies.Controllers
 {
@@ -91,7 +89,11 @@ namespace KiddieParadies.Controllers
             if (viewModel.Id == 0)
             {
                 blog = _mapper.Map<Blog>(viewModel);
-                blog.Time = DateTime.Now;
+                if (Request.GetDisplayUrl().ToLower().Contains("somee"))
+                    blog.Time = DateTime.Now.AddHours(8);
+                else
+                    blog.Time = DateTime.Now;
+
                 var year = (await _yearRepository.GetAsync(y => y.FromDate < blog.Time && y.ToDate > blog.Time)).FirstOrDefault();
                 if (year != null)
                     blog.YearId = year.Id;
@@ -163,14 +165,22 @@ namespace KiddieParadies.Controllers
             _mapper.Map<BlogFormViewModel, Blog>(viewModel, blog);
             if (await _unitOfWork.SaveChangesAsync() <= 0)
             {
-                previousImageName = Path.Combine(_host.ContentRootPath + "\\wwwroot", "images", "news", blog.MainImageName);
-                System.IO.File.Delete(previousImageName);
+                if (!string.IsNullOrWhiteSpace(blog.MainImageName))
+                {
+                    previousImageName = Path.Combine(_host.ContentRootPath + "\\wwwroot", "images", "news",
+                        blog.MainImageName);
+                    System.IO.File.Delete(previousImageName);
+                }
                 ModelState.AddModelError(viewModel.GetPropertyDisplayName(v => v.Title), "يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً");
                 return View("BlogForm", viewModel);
             }
 
             if (!string.IsNullOrWhiteSpace(previousImageName))
+            {
+                previousImageName = Path.Combine(_host.ContentRootPath + "\\wwwroot", "images", "news",
+                    previousImageName);
                 System.IO.File.Delete(previousImageName);
+            }
             return RedirectToAction("New");
         }
 
@@ -203,13 +213,18 @@ namespace KiddieParadies.Controllers
             if (blog == null)
                 return View("NotFound");
 
+            var imageName = blog.MainImageName;
+
             _blogRepository.Delete(blog);
             if (await _unitOfWork.SaveChangesAsync() <= 0)
                 return View("InternalServerError");
-            
-            var imagePath = Path.Combine(_host.ContentRootPath + "\\wwwroot", "images", "news", 
-                blog.MainImageName);
-            System.IO.File.Delete(imagePath);
+
+            if (!string.IsNullOrWhiteSpace(imageName))
+            {
+                var imagePath = Path.Combine(_host.ContentRootPath + "\\wwwroot", "images", "news",
+                    blog.MainImageName);
+                System.IO.File.Delete(imagePath);
+            }
             return RedirectToAction("List");
         }
     }

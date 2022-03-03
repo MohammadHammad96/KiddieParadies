@@ -1,7 +1,7 @@
+using KiddieParadies.Core.Helpers;
 using KiddieParadies.Core.Models;
 using KiddieParadies.Core.Services;
-using KiddieParadies.Data;
-using KiddieParadies.Helpers;
+using KiddieParadies.Infrastructure.Data;
 using KiddieParadies.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 
 namespace KiddieParadies
 {
@@ -26,7 +25,7 @@ namespace KiddieParadies
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionString = String.Empty;
+            string connectionString;
 #if DEBUG
             connectionString = Configuration.GetConnectionString("LocalConnection");
 #else            
@@ -64,6 +63,9 @@ namespace KiddieParadies
             services.AddScoped<IRepository<EmployeeRegistrationInfo>, Repository<EmployeeRegistrationInfo>>();
             services.AddScoped<IRepository<Blog>, Repository<Blog>>();
             services.AddScoped<IRepository<Parent>, Repository<Parent>>();
+            services.AddScoped<IRepository<Student>, Repository<Student>>();
+            services.AddScoped<IRepository<YearStudent>, Repository<YearStudent>>();
+            services.AddScoped<IImagesRepository, ImagesRepository>();
 
             services.AddAutoMapper(typeof(Startup));
         }
@@ -85,6 +87,16 @@ namespace KiddieParadies
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            app.Use(async (context, next) =>
+            {
+                await next();
+                if (context.Response.StatusCode == 404)
+                {
+                    context.Request.Path = "/Home/NotFound";
+                    await next();
+                }
+            });
 
             app.UseRouting();
 

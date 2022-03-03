@@ -27,9 +27,11 @@ namespace KiddieParadies.Mapping
 
             CreateMap<BlogFormViewModel, Blog>();
             CreateMap<ParentFormViewModel, Parent>();
+            CreateMap<StudentFormViewModel, Student>();
 
             CreateMap<Blog, BlogFormViewModel>();
             CreateMap<Parent, ParentFormViewModel>();
+            CreateMap<Student, StudentFormViewModel>();
         }
     }
 }

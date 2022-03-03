@@ -1,3 +1,4 @@
 bin
 obj
-wwwroot
+wwwroot\images
+wwwroot\lib\bootstrap

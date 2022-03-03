@@ -43,16 +43,11 @@
             margin-right: 10px;
             cursor: pointer;
         }
-
-        input {
-        direction: rtl !important;
-        text-align: right !important;
-        }
     </style>
 }
 <section>
     <div id="errors" style="color: #F00;"></div>
-    @using (Html.BeginForm("Save", "Blogs", FormMethod.Post, htmlAttributes: new { @id="blogForm"/*, target = "_blank"*/, @enctype="multipart/form-data" }))
+    @using (Html.BeginForm("Save", "Blogs", FormMethod.Post, htmlAttributes: new { @id = "blogForm"/*, target = "_blank"*/, @enctype = "multipart/form-data" }))
     {
         <div>
             @Html.LabelFor(m => m.Title, new { @class = "col-form-label" })
@@ -66,12 +61,12 @@
         </div>
         <div>
             @Html.LabelFor(m => m.Image, new { @class = "col-form-label" })
-            @Html.TextBoxFor(m => m.Image, htmlAttributes: new { @type="file", @class="form-control", @accept="image/png, image/jpg, image/jpeg" })
+            @Html.TextBoxFor(m => m.Image, htmlAttributes: new { @type = "file", @class = "form-control", @accept = "image/png, image/jpg, image/jpeg" })
             @Html.ValidationMessageFor(m => m.Image)
         </div>
         <div>
             @* @Html.LabelFor(m => m.Content, new { @class = "col-form-label" }) *@
-            @Html.TextAreaFor(m => m.Content, htmlAttributes: new { id = "summernote", name = "editordata", @class="form-control" })
+            @Html.TextAreaFor(m => m.Content, htmlAttributes: new { id = "summernote", name = "editordata", @class = "form-control" })
             @Html.ValidationMessageFor(m => m.Content)
             @*@Html.TextArea(Html.NameFor(Model.Content), htmlAttributes: , name = @Model.Content })*@
             @*<textarea id="summernote" name="editordata"></textarea>*@
@@ -114,7 +109,7 @@
                         $("#saveBtn").removeAttr("disabled");
                     else
                         $("#saveBtn").attr("disabled", "disabled");
-            });
+                });
 
             var form = $('#BlogForm'), origForm = form.serialize();
             $('#blogForm :input').on('change input',

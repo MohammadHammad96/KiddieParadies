@@ -1,6 +1,7 @@
+using KiddieParadies.CustomValidations;
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
 
 namespace KiddieParadies.ViewModels
 {
@@ -14,7 +15,7 @@ namespace KiddieParadies.ViewModels
 
         [Required(ErrorMessage = "هذا الحقل إجباري")]
         [DisplayName("كنية الأب")]
-        public string FatherLaseName { get; set; }
+        public string FatherLastName { get; set; }
 
         [Required(ErrorMessage = "هذا الحقل إجباري")]
         [DisplayName("اسم الأم الكامل")]
@@ -22,10 +23,14 @@ namespace KiddieParadies.ViewModels
 
         [Required]
         public int UserId { get; set; }
-        
+
+        [RequiredFile("Id")]
+        [Image]
         [DisplayName("صورة صفحة الأب بدفتر العائلة")]
         public IFormFile FatherIdentityImage { get; set; }
 
+        [RequiredFile("Id")]
+        [Image]
         [DisplayName("صورة صفحة الأم بدفتر العائلة")]
         public IFormFile MotherIdentityImage { get; set; }
     }

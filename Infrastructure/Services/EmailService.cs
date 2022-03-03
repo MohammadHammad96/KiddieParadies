@@ -1,4 +1,4 @@
-using KiddieParadies.Core.Models;
+using KiddieParadies.Core.Helpers;
 using KiddieParadies.Core.Services;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;

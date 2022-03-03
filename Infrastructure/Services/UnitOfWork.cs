@@ -1,5 +1,5 @@
 using KiddieParadies.Core.Services;
-using KiddieParadies.Data;
+using KiddieParadies.Infrastructure.Data;
 using System.Threading.Tasks;
 
 namespace KiddieParadies.Infrastructure.Services

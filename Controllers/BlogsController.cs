@@ -1,8 +1,8 @@
 using AutoMapper;
+using KiddieParadies.Core.Helpers;
 using KiddieParadies.Core.Models;
 using KiddieParadies.Core.Services;
 using KiddieParadies.Extensions;
-using KiddieParadies.Helpers;
 using KiddieParadies.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -55,6 +55,7 @@ namespace KiddieParadies.Controllers
         {
             if (viewModel == null)
             {
+                viewModel = new BlogFormViewModel();
                 ModelState.AddModelError(viewModel.GetPropertyDisplayName(v => v.Title), "يوجد خطأ بالمدخلات");
                 return View("BlogForm", viewModel);
             }
@@ -85,7 +86,7 @@ namespace KiddieParadies.Controllers
                 return View("BlogForm", viewModel);
             }
 
-            var blog = new Blog();
+            Blog blog;
             if (viewModel.Id == 0)
             {
                 blog = _mapper.Map<Blog>(viewModel);
@@ -113,7 +114,7 @@ namespace KiddieParadies.Controllers
             {
                 string[] acceptedFileTypes = new string[] { ".jpg", ".jpeg", ".png" };
                 var ex = Path.GetExtension(viewModel.Image.FileName).ToLower();
-                if (!acceptedFileTypes.Any(s => s == Path.GetExtension(viewModel.Image.FileName).ToLower()))
+                if (acceptedFileTypes.All(s => s != ex))
                 {
                     ModelState.AddModelError(viewModel.GetPropertyDisplayName(v => v.Image), "لاحقة الصورة يجب أن تكون jpg أو jpeg أو png");
                     return View("BlogForm", viewModel);
@@ -162,7 +163,7 @@ namespace KiddieParadies.Controllers
                 return RedirectToAction("New");
             }
 
-            _mapper.Map<BlogFormViewModel, Blog>(viewModel, blog);
+            _mapper.Map(viewModel, blog);
             if (await _unitOfWork.SaveChangesAsync() <= 0)
             {
                 if (!string.IsNullOrWhiteSpace(blog.MainImageName))

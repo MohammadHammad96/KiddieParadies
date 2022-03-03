@@ -1,0 +1,218 @@
+﻿@model KiddieParadies.ViewModels.StudentFormViewModel
+
+@{
+    if (Model.Id == 0)
+        ViewData["title"] = "إضافة بيانات طالب";
+    else
+        ViewData["title"] = "تعديل بيانات طالب";
+}
+
+@section styles
+{
+    <style>
+        .field-validation-error, .validation-summary-errors {
+            color: #F00;
+        }
+
+        .row > * {
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            margin-top: 10px;
+        }
+    </style>
+}
+
+<div class="row">
+    <div id="errors" style="color: #F00;"></div>
+    @using (Html.BeginForm("SaveStudentProfile", "StudentRegistration", FormMethod.Post, htmlAttributes: new
+    {
+        @id = "studentForm",
+        @enctype = "multipart/form-data",
+        @class = "col-md-10 offset-md-1"
+    }))
+    {
+        @*@Html.ValidationSummary(false, "الرجاء إصلاح الأخطاء التالية")*@
+        <div class="row">
+            <div class="col-md-6">
+                @Html.LabelFor(m => m.FirstName, new { @class = "col-form-label" })
+                @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.FirstName)
+            </div>
+            <div class="col-md-6">
+                @Html.LabelFor(m => m.BirthDate, new { @class = "col-form-label" })
+                @Html.TextBoxFor(m => m.BirthDate,
+                    new
+                    {
+                        @class = "form-control",
+                             @type = "date"
+                        ,
+                             @data_val_validLevelOneBirthDate = "",
+                             @data_val_validLevelTwoBirthDate = "",
+                             @data_val_validLevelThreeBirthDate = "",
+                    })
+                @Html.ValidationMessageFor(m => m.BirthDate)
+            </div>
+            <div class="col-md-6">
+                @Html.LabelFor(m => m.Level, new { @class = "col-form-label" })
+                @foreach (var level in Model.AvailableLevels)
+                {
+                    <div class="form-check">
+                        @{
+                            if (level.Key == 3)
+                            {
+                                <input class="form-check-input" type="radio" asp-for="Level" value="null">
+                            }
+                            else if (level.Key == 4)
+                            {
+                                <input class="form-check-input" type="radio" asp-for="Level" value="false">
+                            }
+                            else if (level.Key == 5)
+                            {
+                                <input class="form-check-input" type="radio" asp-for="Level" value="true">
+                            }
+                        }
+                        <label class="form-check-label" for="@Model.Level">
+                            @level.Value
+                        </label>
+                    </div>
+                }
+                @Html.ValidationMessageFor(m => m.Level)
+            </div>
+            <div class="col-md-6">
+                @Html.LabelFor(m => m.Image, new { @class = "col-form-label" })
+                @Html.TextBoxFor(m => m.Image, htmlAttributes: new
+                {
+                    @type = "file",
+                    @class = "form-control",
+            @accept = "image/png, image/jpg, image/jpeg"
+                })
+                @Html.ValidationMessageFor(m => m.Image)
+            </div>
+            <div class="col-md-6">
+                @Html.LabelFor(m => m.IsMale, new { @class = "col-form-label" })
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" asp-for="IsMale" value="true">
+                    <label class="form-check-label" for="@Model.IsMale">
+                        ذكر
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" asp-for="IsMale" value="false">
+                    <label class="form-check-label" for="@Model.IsMale">
+                        أنثى
+                    </label>
+                </div>
+                @Html.ValidationMessageFor(m => m.IsMale)
+            </div>
+            <div class="col-md-12">
+                <p id="startLocation"></p>
+                <p id="selected-coor"></p>
+                <p id="checkMobile"></p>
+            </div>
+            <div id="map" class="col-md-12"></div>
+        </div>
+
+        @Html.HiddenFor(m => m.Id)
+        @Html.HiddenFor(m => m.ParentId)
+        <input type="submit" class="btn btn-primary" value="متابعة" id="saveBtn" />
+    }
+</div>
+
+@section scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            $("#saveBtn").attr("disabled", "disabled");
+
+            $("#studentForm").on("blur",
+                "input",
+                () => {
+                    if ($("#studentForm").valid())
+                        $("#saveBtn").removeAttr("disabled");
+                    else
+                        $("#saveBtn").attr("disabled", "disabled");
+                });
+
+            var form = $('#studentForm'), origForm = form.serialize();
+            $('#studentForm :input').on('change input',
+                function () {
+                    if (form.serialize() !== origForm)
+                        $("#saveBtn").removeAttr("disabled");
+                    else
+                        $("#saveBtn").attr("disabled", "disabled");
+
+                    $("#errors").html("");
+                });
+
+            $("input[type='date']").keydown(function (e) {
+                var keyCode = e.keyCode || e.which;
+
+                if (!((keyCode == 9) || (keyCode == 13) || (keyCode == 16)))
+                    return false;
+            });
+
+            /*var selectedDate = new Date();
+            $("#BirthDate").attr("data_val_validLevelOneBirthDate", "تاريخ الميلاد يجب أن يكون بين 01-01-"
+                + (selectedDate.getYear() - 3 + 1900) + " و 31-12-" + (selectedDate.getYear() - 3 + 1900));
+            $("#BirthDate").attr("data_val_validLevelTwoBirthDate", "تاريخ الميلاد يجب أن يكون بين 01-01-"
+                + (selectedDate.getYear() - 4 + 1900) + " و 31-12-" + (selectedDate.getYear() - 4 + 1900));
+            $("#BirthDate").attr("data_val_validLevelThreeBirthDate", "تاريخ الميلاد يجب أن يكون بين 01-01-"
+                + (selectedDate.getYear() - 5 + 1900) + " و 31-12-" + (selectedDate.getYear() - 5 + 1900));*/
+        });
+
+        $(function () {
+            jQuery.validator.addMethod('validLevelOneBirthDate', function (value, element, params) {
+                var isValid = true;
+                if ($('#Level:checked').val() == "null")
+                    if (new Date().getYear() - new Date(value).getYear() != 2)
+                        isValid = false;
+                return isValid;
+            });
+
+            jQuery.validator.unobtrusive.adapters.add('validLevelOneBirthDate', [], function (options) {
+                options.rules['validLevelOneBirthDate'] = {};
+                options.messages['validLevelOneBirthDate'] = "تاريخ الميلاد يجب أن يكون بين 01-01-"
+                    + (new Date().getYear() - 2 + 1900) + " و 31-12-" + (new Date().getYear() - 2 + 1900) +
+                    " للتسجيل بالمستوى الأول (ثلاث سنوات).";
+            });
+        }(jQuery));
+
+        $(function () {
+            jQuery.validator.addMethod('validLevelTwoBirthDate', function (value, element, params) {
+                var isValid = true;
+                if ($('#Level:checked').val() == "false")
+                    if (new Date().getYear() - new Date(value).getYear() != 3)
+                        isValid = false;
+                return isValid;
+            });
+
+            jQuery.validator.unobtrusive.adapters.add('validLevelTwoBirthDate', [], function (options) {
+                options.rules['validLevelTwoBirthDate'] = {};
+                options.messages['validLevelTwoBirthDate'] = "تاريخ الميلاد يجب أن يكون بين 01-01-"
+                    + (new Date().getYear() - 3 + 1900) + " و 31-12-" + (new Date().getYear() - 3 + 1900) +
+                    " للتسجيل بالمستوى الثاني (أربع سنوات).";
+            });
+        }(jQuery));
+
+        $(function () {
+            jQuery.validator.addMethod('validLevelThreeBirthDate', function (value, element, params) {
+                var isValid = true;
+                if ($('#Level:checked').val() == "true")
+                    if (new Date().getYear() - new Date(value).getYear() != 4)
+                        isValid = false;
+                return isValid;
+            });
+
+            jQuery.validator.unobtrusive.adapters.add('validLevelThreeBirthDate', [], function (options) {
+                options.rules['validLevelThreeBirthDate'] = {};
+                options.messages['validLevelThreeBirthDate'] = "تاريخ الميلاد يجب أن يكون بين 01-01-"
+                    + (new Date().getYear() - 4 + 1900) + " و 31-12-" + (new Date().getYear() - 4 + 1900) +
+                    " للتسجيل بالمستوى الثالث (خمس سنوات).";
+            });
+        }(jQuery));
+    </script>
+}

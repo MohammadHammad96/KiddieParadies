@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace KiddieParadies.CustomValidations
 {
@@ -45,15 +44,14 @@ namespace KiddieParadies.CustomValidations
             MergeAttribute(context.Attributes, "data-val-daterange-max", _max.ToString("MM/dd/yyyy"));
         }
 
-        private bool MergeAttribute(IDictionary<string, string> attributes, string key, string value)
+        private void MergeAttribute(IDictionary<string, string> attributes, string key, string value)
         {
             if (attributes.ContainsKey(key))
             {
-                return false;
+                return;
             }
 
             attributes.Add(key, value);
-            return true;
         }
     }
 }

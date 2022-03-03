@@ -1,7 +1,6 @@
-using System.ComponentModel;
-using System;
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace KiddieParadies.ViewModels
 {
@@ -16,7 +15,7 @@ namespace KiddieParadies.ViewModels
         [Required(ErrorMessage = "هذا الحقل إجباري")]
         [MaxLength(250, ErrorMessage = "عدد الحروف يجب ألا يتجاوز {1}")]
         public string Title { get; set; }
-        
+
         [DisplayName("الصورة الرئيسية")]
         public IFormFile Image { get; set; }
 

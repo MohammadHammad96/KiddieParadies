@@ -8,7 +8,6 @@ namespace KiddieParadies.CustomValidations
     public class RequireTypeaheadAttribute : ValidationAttribute, IClientModelValidator
     {
         private readonly string[] _otherProperties;
-    private const string _DefaultErrorMessage = "The {0} field is required";
 
         private new string ErrorMessage =>
             $"الرجاء اختيار عام من القائمة دون التعديل عليه.";
@@ -16,31 +15,36 @@ namespace KiddieParadies.CustomValidations
         public RequireTypeaheadAttribute(params string[] otherProperties)
         {
             if (otherProperties.Length == 0) // would not make sense
-        {
-            throw new ArgumentException("At least one other property name must be provided");
-        }
-        _otherProperties = otherProperties;
-        //ErrorMessage = _DefaultErrorMessage;
+            {
+                throw new ArgumentException("At least one other property name must be provided");
+            }
+            _otherProperties = otherProperties;
+            //ErrorMessage = _DefaultErrorMessage;
         }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
 
-                foreach (string property in _otherProperties)
+            foreach (string property in _otherProperties)
+            {
+                var propertyName = validationContext.ObjectType.GetProperty(property);
+                if (propertyName == null)
                 {
-                    var propertyName = validationContext.ObjectType.GetProperty(property);
-                    if (propertyName == null)
-                    {
-                        continue;
-                    }
-                    var propertyValue = propertyName.GetValue(validationContext.ObjectInstance, null);
-                    if (propertyValue == null)
-                    {
-                        return new ValidationResult(ErrorMessage);
-                    }
-                    else if (int.Parse(propertyValue.ToString()) == 0)
-                        return new ValidationResult(ErrorMessage);
+                    continue;
                 }
+                var propertyValue = propertyName.GetValue(validationContext.ObjectInstance, null);
+                if (propertyValue == null)
+                {
+                    return new ValidationResult(ErrorMessage);
+                }
+
+                var val = propertyValue.ToString();
+                if (string.IsNullOrWhiteSpace(val))
+                    return new ValidationResult(ErrorMessage);
+
+                if (int.Parse(val) == 0)
+                    return new ValidationResult(ErrorMessage);
+            }
 
             return ValidationResult.Success;
 
@@ -53,15 +57,14 @@ namespace KiddieParadies.CustomValidations
             MergeAttribute(context.Attributes, "data-val-requiretypeahead-otherproperties", string.Join(",", _otherProperties));
         }
 
-        private bool MergeAttribute(IDictionary<string, string> attributes, string key, string value)
+        private void MergeAttribute(IDictionary<string, string> attributes, string key, string value)
         {
             if (attributes.ContainsKey(key))
             {
-                return false;
+                return;
             }
 
             attributes.Add(key, value);
-            return true;
         }
     }
 }

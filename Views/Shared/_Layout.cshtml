@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     @await RenderSectionAsync("metaTags", required: false)
     @await RenderSectionAsync("styles", required: false)
-    <title>@ViewData["Title"]</title>
+    <title>روضة السعادة - @ViewData["Title"]</title>
     <link rel="shortcut icon" href="~/Logo.png">
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.rtl.min.css"
@@ -66,7 +66,7 @@
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Parents" asp-action="New">تسجيل بيانات أولياء الأمور</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="StudentRegistration" asp-action="NewParentsProfile">تسجيل طالب</a>
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />
@@ -89,7 +89,6 @@
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"></script>

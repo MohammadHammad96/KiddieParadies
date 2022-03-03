@@ -1,9 +1,9 @@
 using AutoMapper;
 using KiddieParadies.Controllers.Apis.Dtos;
+using KiddieParadies.Core.Helpers;
 using KiddieParadies.Core.Models;
 using KiddieParadies.Core.Services;
 using KiddieParadies.Extensions;
-using KiddieParadies.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -31,7 +31,7 @@ namespace KiddieParadies.Controllers.Apis
         [HttpGet]
         public async Task<IActionResult> GetAsync(string query = null)
         {
-            IEnumerable<Year> years = new List<Year>();
+            IEnumerable<Year> years;
             if (string.IsNullOrWhiteSpace(query))
                 years = await _yearRepository.GetAsync();
             else

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace KiddieParadies.Data
+namespace KiddieParadies.Infrastructure.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>
     {
@@ -23,6 +23,10 @@ namespace KiddieParadies.Data
 
         public DbSet<Parent> Parents { get; set; }
 
+        public DbSet<Student> Students { get; set; }
+
+        public DbSet<YearStudent> YearStudents { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -32,6 +36,10 @@ namespace KiddieParadies.Data
             builder.Entity<Year>().HasIndex(y => y.Name).IsUnique();
 
             builder.Entity<Parent>().HasIndex(p => p.UserId).IsUnique();
+
+            builder.Entity<YearStudent>().HasIndex(p => new { p.YearId, p.StudentId }).IsUnique();
+
+            builder.Entity<Student>().HasIndex(s => new { s.FirstName, s.ParentId });
         }
     }
 }

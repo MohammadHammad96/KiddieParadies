@@ -132,8 +132,8 @@
         }
 
         input {
-        direction: rtl !important;
-        text-align: right !important;
+            direction: rtl !important;
+            text-align: right !important;
         }
     </style>
 }
@@ -566,54 +566,6 @@
                     }
                 });
             });
-
-            /*$.validator.unobtrusive.adapters.add("daterange",
-                ["min", "max"],
-                function (options) {
-                    if (options.params.min) {
-                        setValidationValues(options, "min", options.params.min);
-                    }
-                    if (options.params.max) {
-                        setValidationValues(options, "max", options.params.max);
-                    }
-                });
-            $.validator.addMethod("daterange",
-                function (value, element, params) {
-                    //var flag = (value >= parameters[0]) && (value <= parameters[1]);
-                    //console.log(flag);
-                    //return false;
-                    //return flag;
-                    console.log("start validate");
-                    if (!value) return false;
-                    var minDate = new Date();
-                    var maxDate = new Date();
-
-                    minDate.setDate(parseInt(params.min));
-                    maxDate.setDate(parseInt(params.max));
-
-                    return value >= minDate && value <= maxDate;
-                });*/
-
-
-            /*jQuery.validator.addMethod('dayRange', function (value, element, param) {
-                if (!value) return false;
-                var valueDateParts = value.split(param.seperator);
-                var minDate = new Date();
-                var maxDate = new Date();
-                var now = new Date();
-                var dateValue = new Date(valueDateParts[2],
-                    (valueDateParts[1] - 1),
-                    valueDateParts[0],
-                    now.getHours(),
-                    now.getMinutes(),
-                    (now.getSeconds() + 5));
-
-                minDate.setDate(minDate.getDate() - parseInt(param.min));
-                maxDate.setDate(maxDate.getDate() + parseInt(param.max));
-
-                return dateValue >= minDate && dateValue <= maxDate;
-            });*/
-
         });
 
 
@@ -629,108 +581,5 @@
 
                 $("#errors").html("");
             });
-
-        $(function () {
-            console.log("start big function");
-            jQuery.validator.addMethod('daterange', function (value, element, params) {
-                //console.log("start validate");
-                if (!value) return false;
-                var minDate = new Date(params.min);
-                var maxDate = new Date(params.max);
-                minDate.setHours(0, 0, 0, 0);
-                maxDate.setHours(0, 0, 0, 0);
-                //console.log(params);
-                //minDate.setDate(parseInt(params.min));
-                //maxDate.setDate(parseInt(params.max));
-                console.log("min ", minDate);
-                console.log("max ", maxDate);
-                value = new Date(value);
-                value.setHours(0, 0, 0, 0);
-                console.log("val ", value);
-                console.log("---------------------");
-
-                return value >= minDate && value <= maxDate;
-            });
-
-            jQuery.validator.unobtrusive.adapters.add('daterange', ['min', 'max'], function (options) {
-                //console.log("start adapter");
-                var params = {
-                    min: options.params.min,
-                    max: options.params.max
-                };
-                //console.log(params);
-                options.rules['daterange'] = params;
-                if (options.message) {
-                    options.messages['daterange'] = options.message;
-                }
-            });
-        }(jQuery));
-
-         sandtrapValidation = {
-            getDependentElement: function (validationElement, dependentProperty) {
-                var dependentElement = $('#' + dependentProperty);
-                if (dependentElement.length === 1) {
-                    return dependentElement;
-                }
-                var name = validationElement.name;
-                var index = name.lastIndexOf(".") + 1;
-                var id = (name.substr(0, index) + dependentProperty).replace(/[\.\[\]]/g, "_");
-                dependentElement = $('#' + id);
-                if (dependentElement.length === 1) {
-                    return dependentElement;
-                }
-                // Try using the name attribute
-                name = (name.substr(0, index) + dependentProperty);
-                dependentElement = $('[name="' + name + '"]');
-                if (dependentElement.length > 0) {
-                    return dependentElement.first();
-                }
-                return null;
-            }
-        }
-
-        $(function () {
-            jQuery.validator.addMethod('lessthandatetime', function (value, element, params) {
-                var isValid = true;
-                $.each(params.otherproperties, function (index, item) {
-                    if (new Date($(this).val()) >= new Date(value)) {
-                        console.log($(this).val());
-                        isValid = false;
-                    }
-                });
-                return isValid;
-                /*//console.log("start validate");
-                if (!value) return false;
-                var minDate = new Date(params.min);
-                var maxDate = new Date(params.max);
-                minDate.setHours(0, 0, 0, 0);
-                maxDate.setHours(0, 0, 0, 0);
-                //console.log(params);
-                //minDate.setDate(parseInt(params.min));
-                //maxDate.setDate(parseInt(params.max));
-                console.log("min ", minDate);
-                console.log("max ", maxDate);
-                value = new Date(value);
-                value.setHours(0, 0, 0, 0);
-                console.log("val ", value);
-                console.log("---------------------");
-
-                return value >= minDate && value <= maxDate;*/
-            });
-
-            jQuery.validator.unobtrusive.adapters.add('lessthandatetime', ['otherproperties'], function (options) {
-                //console.log("start adapter");
-                var element = options.element;
-                var otherNames = options.params.otherproperties.split(',');
-                var otherProperties = [];
-                $.each(otherNames, function (index, item) {
-                    otherProperties.push(sandtrapValidation.getDependentElement(element, item))
-                });
-                options.rules['lessthandatetime'] = {
-                    otherproperties: otherProperties
-                };
-                options.messages['lessthandatetime'] = options.message;
-            });
-        }(jQuery));
     </script>
 }

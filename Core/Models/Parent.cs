@@ -10,16 +10,18 @@ namespace KiddieParadies.Core.Models
         public string FatherName { get; set; }
 
         [Required(ErrorMessage = "هذا الحقل إجباري")]
-        public string FatherLaseName { get; set; }
+        public string FatherLastName { get; set; }
 
         [Required(ErrorMessage = "هذا الحقل إجباري")]
         public string MotherFullName { get; set; }
 
         [Required(ErrorMessage = "هذا الحقل إجباري")]
-        public string FatherIdentityImagePath { get; set; }
+        public string FatherIdentityImageName { get; set; }
 
         [Required(ErrorMessage = "هذا الحقل إجباري")]
-        public string MotherIdentityImagePath { get; set; }
+        public string MotherIdentityImageName { get; set; }
+
+        public bool IsValid { get; set; }
 
         public int UserId { get; set; }
 

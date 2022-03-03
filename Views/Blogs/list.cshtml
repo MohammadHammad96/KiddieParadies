@@ -23,15 +23,15 @@
         <div class="col-md-10">
             <div class="row">
                 <div class="row">
-                    @Html.ActionLink(blog.Title, "read", "news", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-8" })
+                    @Html.ActionLink(blog.Title, "GetById", "Blogs", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-8" })
                     <span class="col-lg-3 col-md-4 col-sm-12">@blog.Time.ToString("ddd dd-MM-yyyy hh:mm tt", new CultureInfo("ar"))</span>
                 </div>
                 <div class="row">
                     <span class="col-md-12">@blog.ShortContent</span>
                 </div>
                 <div class="row">
-                    @Html.ActionLink("تعديل", "edit", "news", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-1 offset-md-10 col-sm-2 offset-sm-8" })
-                    @Html.ActionLink("حذف", "delete", "news", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-1 col-sm-2" })
+                    @Html.ActionLink("تعديل", "Edit", "Blogs", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-1 offset-md-10 col-sm-2 offset-sm-8" })
+                    @Html.ActionLink("حذف", "Delete", "Blogs", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-1 col-sm-2" })
                 </div>
             </div>
         </div>

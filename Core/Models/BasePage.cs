@@ -2,10 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace KiddieParadies.Core.Models
 {
-    public abstract class BasePage
+    public abstract class BasePage : Entity
     {
-        public int Id { get; set; }
-
         [Required]
         public string Content { get; set; }
 

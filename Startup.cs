@@ -66,6 +66,11 @@ namespace KiddieParadies
             services.AddScoped<IRepository<Student>, Repository<Student>>();
             services.AddScoped<IRepository<YearStudent>, Repository<YearStudent>>();
             services.AddScoped<IImagesRepository, ImagesRepository>();
+            services.AddScoped<IFilesRepository, FilesRepository>();
+            services.AddScoped<IRepository<Employee>, Repository<Employee>>();
+            services.AddScoped<IRepository<Level>, Repository<Level>>();
+            services.AddScoped<IRepository<Course>, Repository<Course>>();
+            services.AddScoped<IRepository<LevelCourse>, Repository<LevelCourse>>();
 
             services.AddAutoMapper(typeof(Startup));
         }

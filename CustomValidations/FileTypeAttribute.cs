@@ -5,14 +5,19 @@ using System.Linq;
 
 namespace KiddieParadies.CustomValidations
 {
-    public class ImageAttribute : ValidationAttribute
+    public class FileTypeAttribute : ValidationAttribute
     {
-        private static readonly string[] AcceptedFileTypes = new string[] { ".jpg", ".jpeg", ".png" };
+        private readonly string[] _acceptedFileTypes;
 
-        public ImageAttribute()
+        public FileTypeAttribute(params string[] acceptedFileTypes)
         {
             if (string.IsNullOrWhiteSpace(ErrorMessage))
-                ErrorMessage = "لاحقة الصورة يجب أن تكون jpg أو jpeg أو png";
+                ErrorMessage = "لاحقة الملف يجب أن تكون " + string.Join(" أو ", acceptedFileTypes);
+
+            for (var i = 0; i < acceptedFileTypes.Length; i++)
+                acceptedFileTypes[i] = string.Concat(".", acceptedFileTypes[i]);
+
+            _acceptedFileTypes = acceptedFileTypes;
         }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
@@ -22,7 +27,7 @@ namespace KiddieParadies.CustomValidations
                 return ValidationResult.Success;
 
             var fileExtension = Path.GetExtension(file.FileName).ToLower();
-            if (AcceptedFileTypes.Any(t => t == fileExtension))
+            if (_acceptedFileTypes.Any(t => t == fileExtension))
                 return ValidationResult.Success;
 
             return new ValidationResult(ErrorMessage);

@@ -6,10 +6,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KiddieParadies.Core.Models
 {
-    public class Year
+    public class Year : Entity
     {
-        public int Id { get; set; }
-
         [Required]
         public string Name { get; set; }
 
@@ -30,9 +28,13 @@ namespace KiddieParadies.Core.Models
 
         public ICollection<StudentRegistrationInfo> StudentRegistrationInfos { get; set; }
 
+        public ICollection<LevelCourse> LevelCourses { get; set; }
+
         public Year()
         {
             StudentRegistrationInfos = new List<StudentRegistrationInfo>();
+
+            LevelCourses = new List<LevelCourse>();
         }
     }
 }

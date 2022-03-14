@@ -2,10 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace KiddieParadies.Core.Models
 {
-    public class Parent
+    public class Parent : Entity
     {
-        public int Id { get; set; }
-
         [Required(ErrorMessage = "هذا الحقل إجباري")]
         public string FatherName { get; set; }
 
@@ -26,5 +24,8 @@ namespace KiddieParadies.Core.Models
         public int UserId { get; set; }
 
         public ApplicationUser User { get; set; }
+
+        [Required]
+        public Location HomeLocation { get; set; }
     }
 }

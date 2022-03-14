@@ -1,0 +1,96 @@
+﻿@model KiddieParadies.ViewModels.LevelCourseViewModel
+@{
+    ViewData["title"] = "إدارة مقررات المستويات";
+}
+
+<h4 style="color: #03E; margin-bottom: 15px;">إدارة مقررات المستويات</h4>
+
+@using (Html.BeginForm("Index", "LevelCourse", FormMethod.Post, new { @id = "levelCoursesForm" }))
+{
+    <div class="row">
+        @foreach (var level in Model.Levels)
+        {
+            <div class="col-md-4 col-sm-12">
+                <p><strong>مستوى @level.Name</strong></p>
+                @foreach (var course in Model.Courses)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="@level.Id,@course.Id" name="@course.Name@level.Id" id="@course.Id@level.Id">
+                        <label class="form-check-label" for="@course.Name@level.Id">
+                            @course.Name
+                        </label>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+    <input type="submit" class="btn btn-primary" value="حفظ" />
+}
+
+@section Scripts
+{
+    <script>
+        class LevelCourse {
+            constructor(levelId, courseId) {
+                this.LevelId = levelId;
+                this.CourseId = courseId;
+            }
+        }
+
+        var levelCourses = [];
+
+        $(document).ready(function (e) {
+
+            $.ajax({
+                async: false,
+                url: '/api/levelCourses/getAll',
+                method: 'GET',
+                contentType: 'application/json',
+                dataType: 'json',
+                statusCode: {
+                    200: function (response) {
+                        if (response.length > 0)
+                            for (levelCourse of response) {
+                                $("#" + levelCourse.courseId + levelCourse.levelId).attr("checked", "checked");
+                                levelCourses.push(new LevelCourse(levelCourse.levelId, levelCourse.courseId));
+                            }
+                    }
+                }
+            });
+
+            $("input[type='checkbox']").change(function (e) {
+                if ($(this).prop('checked'))
+                    levelCourses.push(new LevelCourse(this.value.split(",")[0], this.value.split(",")[1]));
+                else
+                    for (let i = 0; i < levelCourses.length; i++)
+                        if (levelCourses[i].LevelId == this.value.split(",")[0] && levelCourses[i].CourseId == this.value.split(",")[1])
+                            levelCourses.splice(i, 1);
+            });
+
+            $("#levelCoursesForm").submit(function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    async: false,
+                    url: '/api/levelCourses/save',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data: JSON.stringify({
+                        LevelCourses: levelCourses
+                    }),
+                    statusCode: {
+                        200: function (year) {
+                            $("#notification").text("تم تحديث مقررات المستويات بنجاح.");
+                            $('.toast').toast('show');
+                        },
+                        400: function () {
+                            $("#notification").text("يوجد خطأ بالمخدم يرجى المحاولة لاحقاً.");
+                            $('.toast').toast('show');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

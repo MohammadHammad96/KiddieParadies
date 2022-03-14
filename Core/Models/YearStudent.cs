@@ -4,10 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace KiddieParadies.Core.Models
 {
-    public class YearStudent
+    public class YearStudent : Entity
     {
-        public int Id { get; set; }
-
         [DataType(DataType.Date)]
         [Column(TypeName = "Date")]
         public DateTime? FromDate { get; set; }

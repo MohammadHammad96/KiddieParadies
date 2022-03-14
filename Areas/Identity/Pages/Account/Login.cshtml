@@ -25,12 +25,12 @@
                 <h4>استخدم حساب محلي لتسجيل الدخول</h4>
                 <hr />
                 <div asp-validation-summary="All" class="text-danger"></div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Input.Email"></label>
                     <input asp-for="Input.Email" class="form-control" />
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <label asp-for="Input.Password"></label>
                     <div class="input-group" id="show_hide_password">
                         <input class="form-control passwordDisplay" asp-for="Input.Password">
@@ -42,7 +42,7 @@
                     </div>
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <div class="checkbox">
                         <label asp-for="Input.RememberMe">
                             <input asp-for="Input.RememberMe" />
@@ -50,10 +50,10 @@
                         </label>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <button type="submit" class="btn btn-primary">تسجيل دخول</button>
                 </div>
-                <div class="form-group">
+                <div class="mb-3">
                     <p>
                         <a id="forgot-password" asp-page="./ForgotPassword">هل نسيت كلمة السر؟</a>
                     </p>

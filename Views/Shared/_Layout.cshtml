@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using KiddieParadies.Core.Models
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> _signInManager
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
@@ -13,7 +16,7 @@
           crossorigin="anonymous">
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
           integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
-    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <style>
         #btnBackToTop {
             position: fixed;
@@ -27,18 +30,35 @@
         .fa-chevron-circle-up {
             font-size: 30px;
         }
+
+        .toast-container {
+            top: 55px !important;
+        }
+
+        @@media only screen and (max-width: 600px) {
+            #messages, #notifications {
+                width: 90% !important;
+            }
+        }
     </style>
 </head>
 <body style="padding-top: 85px;">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3 fixed-top">
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3 fixed-top">
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
                     <img src="~/Logo.png" alt="روضة السعادة"
                          style="height:auto; width:auto; max-height:50px; max-width:250px; margin-top:0;
-                    margin-bottom:0;" />
+                                margin-bottom:0;" />
                 </a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                <a style="display: block; float: left; cursor: pointer;" id="messengerIcon">
+                    <i class="fab fa-facebook-messenger" style="color: #05F; font-size: 30px; margin-left: 15px;"></i>
+                </a>
+
+                <a style="display: block; float: left; cursor: pointer;" id="notificationIcon">
+                    <i class="fas fa-bell" style="color: #F39; font-size: 30px; margin-left: 15px;"></i>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -68,6 +88,9 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="StudentRegistration" asp-action="NewParentsProfile">تسجيل طالب</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="EmployeeRegistration" asp-action="NewEmployeeProfile">انضم لنا</a>
+                        </li>
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
@@ -75,7 +98,31 @@
         </nav>
     </header>
     <div class="container">
+        <div id="messages"
+             style="background-color: #ffb6c1; border: black solid 0.75px; border-radius: 5px; width: 350px; height: 450px; position: absolute; display: none; top: 75px;">
+            <p style="font-size: x-large; margin: 5px 10px 0px 0px;">
+                المحادثات
+            </p>
+        </div>
+        <div id="notifications"
+             style="background-color: #ffb6c1; border: black solid 0.75px; border-radius: 5px; width: 350px; height: 450px; position: absolute; display: none; top: 75px;">
+            <p style="font-size: x-large; margin: 5px 10px 0px 0px;">
+                الإشعارات
+            </p>
+        </div>
         <main role="main" class="pb-3">
+            <div class="toast-container position-fixed end-0 p-3" style="top: 60px !important;">
+                <div class="toast fade hide" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <img src="/Logo.png" style="width: 40px;" class="rounded me-2" alt="روضة السعادة">
+                        <strong class="me-auto">روضة السعادة</strong>
+                        <small class="text-muted">الآن</small>
+                        <button type="button" id="toastBtn" class="btn-close" data-bs-dismiss="toast"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body" id="notification"></div>
+                </div>
+            </div>
             @RenderBody()
             <a href="#" class="" id="btnBackToTop">
                 <i class="fas fa-chevron-circle-up"></i>
@@ -120,5 +167,51 @@
             }
         });
     </script>
+    @if (!_signInManager.IsSignedIn(User))
+    {
+        <script id="flag">
+            $("#messengerIcon").remove();
+            $("#messages").remove();
+            $("#notificationIcon").remove();
+            $("#notifications").remove();
+            $(".toast-container").remove();
+            $("#flag").remove();
+        </script>
+
+    }
+    else
+    {
+        <script>
+            $(document).ready(function () {
+                $("#messengerIcon").click(function (e) {
+                    e.preventDefault();
+                    if (!$("#messages").is(":visible"))
+                        $("#messages").show();
+                    else
+                        $("#messages").hide();
+                    $("#notifications").hide();
+                });
+
+                $("#notificationIcon").click(function (e) {
+                    e.preventDefault();
+                    if (!$("#notifications").is(":visible"))
+                        $("#notifications").show();
+                    else
+                        $("#notifications").hide();
+                    $("#messages").hide();
+                });
+
+                $(document).click(function (e) {
+                    if (e.target.id !== "messages" && e.target.id !== "notifications"
+                        && e.target.id !== "messengerIcon" && e.target.id !== "notificationIcon"
+                        && e.target.parentElement.id !== "messengerIcon" && e.target.parentElement.id !== "notificationIcon"
+                        && !$(e.target).parents('#messages').length && !$(e.target).parents('#notifications').length) {
+                        $("#messages").hide();
+                        $("#notifications").hide();
+                    }
+                });
+            });
+        </script>
+    }
 </body>
 </html>

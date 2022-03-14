@@ -30,12 +30,14 @@ namespace KiddieParadies.Controllers
         private readonly IImagesRepository _imagesRepository;
         private const string ParentsImagesFolderName = "parentsIdentity";
         private const string StudentsImagesFolderName = "students";
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
         public StudentRegistrationController(IRepository<StudentRegistrationInfo> studentRegistrationInfoRepository,
             UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor,
             IRepository<Year> yearRepository, IRepository<YearStudent> yearStudentRepository,
             IRepository<Parent> parentRepository, IMapper mapper, IUnitOfWork unitOfWork,
-            IRepository<Student> studentRepository, IImagesRepository imagesRepository)
+            IRepository<Student> studentRepository, IImagesRepository imagesRepository,
+            SignInManager<ApplicationUser> signInManager)
         {
             _studentRegistrationInfoRepository = studentRegistrationInfoRepository;
             _userManager = userManager;
@@ -46,6 +48,7 @@ namespace KiddieParadies.Controllers
             _unitOfWork = unitOfWork;
             _studentRepository = studentRepository;
             _imagesRepository = imagesRepository;
+            _signInManager = signInManager;
             _loggedUser = _userManager.FindByNameAsync(httpContextAccessor.HttpContext.User.Identity.Name).Result;
             _userRoles = _userManager.GetRolesAsync(_loggedUser).Result;
         }
@@ -86,7 +89,7 @@ namespace KiddieParadies.Controllers
         [Authorize(Roles = "Admin,Parent")]
         public async Task<IActionResult> EditParentsProfile(int id)
         {
-            var parent = await _parentRepository.GetByIdAsync(id);
+            var parent = await _parentRepository.GetByIdAsync(id, p => p.HomeLocation);
             if (parent == null)
                 return View("NotFound");
 
@@ -141,7 +144,8 @@ namespace KiddieParadies.Controllers
 
                 user = await _userManager.FindByIdAsync(viewModel.UserId.ToString());
                 if (user == null)
-                    return View("NotFound");
+                    return View("Error",
+                        new ErrorViewModel("·« ÌÊÃœ „” Œœ„ »«·„⁄—› «·„ÿ·Ê»."));
 
                 if (viewModel.Id == 0)
                 {
@@ -157,7 +161,7 @@ namespace KiddieParadies.Controllers
                     await _parentRepository.AddAsync(parent);
                     await _userManager.AddToRoleAsync(user, "Parent");
                     if (await _unitOfWork.SaveChangesAsync() > 0)
-                        return RedirectToAction("NewParentsProfile");
+                        return RedirectToAction("NewStudentProfile", parent.Id);
 
                     _imagesRepository.Delete(parent.FatherIdentityImageName, ParentsImagesFolderName);
                     _imagesRepository.Delete(parent.MotherIdentityImageName, ParentsImagesFolderName);
@@ -166,9 +170,10 @@ namespace KiddieParadies.Controllers
                     return View("ParentForm", viewModel);
                 }
 
-                var parentToUpdate = await _parentRepository.GetByIdAsync(viewModel.Id);
+                var parentToUpdate = await _parentRepository.GetByIdAsync(viewModel.Id, p => p.HomeLocation);
                 if (parentToUpdate == null)
-                    return View("NotFound");
+                    return View("Error",
+                        new ErrorViewModel("·« ÌÊÃœ Ê·Ì √„— »«·„⁄—› «·„ÿ·Ê»."));
 
                 var previousFatherImageName = parentToUpdate.FatherIdentityImageName;
                 var previousMotherImageName = parentToUpdate.MotherIdentityImageName;
@@ -211,9 +216,10 @@ namespace KiddieParadies.Controllers
                     return View("NotFound");
 
                 if (await RegistrationAvailable(year.Id) == 0)
-                    return View("NotFound");
+                    return View("Error",
+                        new ErrorViewModel("«· ”ÃÌ· €Ì— „ «Õ Õ«·Ì«."));
 
-                var parentToUpdate = await _parentRepository.GetByIdAsync(viewModel.Id);
+                var parentToUpdate = await _parentRepository.GetByIdAsync(viewModel.Id, p => p.HomeLocation);
                 if (parentToUpdate == null)
                     return View("NotFound");
 
@@ -275,7 +281,8 @@ namespace KiddieParadies.Controllers
                 return View("NotFound");
 
             if (await RegistrationAvailable(year.Id) == 0)
-                return View("NotFound");
+                return View("Error",
+                    new ErrorViewModel("«· ”ÃÌ· €Ì— „ «Õ Õ«·Ì«."));
 
             parent = _mapper.Map<Parent>(viewModel);
 
@@ -288,8 +295,12 @@ namespace KiddieParadies.Controllers
             await _parentRepository.AddAsync(parent);
             user = await _userManager.FindByIdAsync(_loggedUser.Id.ToString());
             await _userManager.AddToRoleAsync(user, "Parent");
+
             if (await _unitOfWork.SaveChangesAsync() > 0)
+            {
+                await _signInManager.SignInAsync(user, true);
                 return RedirectToAction("NewParentsProfile");
+            }
 
             _imagesRepository.Delete(parent.FatherIdentityImageName, ParentsImagesFolderName);
             _imagesRepository.Delete(parent.MotherIdentityImageName, ParentsImagesFolderName);
@@ -460,8 +471,9 @@ namespace KiddieParadies.Controllers
             string previousImageName;
 
             var existStudent = await _studentRepository
-                    .GetAsync(s => s.FirstName == viewModel.FirstName && s.Id != viewModel.Id);
-            if (existStudent != null)
+                    .GetAsync(s => s.FirstName == viewModel.FirstName && s.Id != viewModel.Id
+                    && s.ParentId == viewModel.ParentId);
+            if (existStudent.Any())
             {
                 ModelState
                     .AddModelError("FirstName", "·ﬁœ  „  ”ÃÌ· ÿ«·» »Â–« «·«”„ „”»ﬁ« ·‰›” √Ê·Ì«¡ «·√„—");

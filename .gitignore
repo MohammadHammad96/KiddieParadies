@@ -1,4 +1,6 @@
 bin
 obj
 **/wwwroot/images
+**/wwwroot/employees
 **/wwwroot/lib/bootstrap
+**.sql

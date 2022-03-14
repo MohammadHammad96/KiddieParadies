@@ -25,13 +25,22 @@ namespace KiddieParadies.ViewModels
         public int UserId { get; set; }
 
         [RequiredFile("Id")]
-        [Image]
+        [FileType("jpeg", "jpg", "png")]
         [DisplayName("صورة صفحة الأب بدفتر العائلة")]
         public IFormFile FatherIdentityImage { get; set; }
 
         [RequiredFile("Id")]
-        [Image]
+        [FileType("jpeg", "jpg", "png")]
         [DisplayName("صورة صفحة الأم بدفتر العائلة")]
         public IFormFile MotherIdentityImage { get; set; }
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "موقع المنزل إجباري")]
+        public string Longitude { get; set; }
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "موقع المنزل إجباري")]
+        public string Latitude { get; set; }
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "موقع المنزل إجباري")]
+        public string Zoom { get; set; }
     }
 }

@@ -1,4 +1,6 @@
 @model KiddieParadies.ViewModels.ParentFormViewModel
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration _configuration
 
 @{
     if (Model.Id == 0)
@@ -66,31 +68,38 @@
             <div class="col-md-6">
                 @Html.LabelFor(m => m.FatherIdentityImage, new { @class = "col-form-label" })
                 @Html.TextBoxFor(m => m.FatherIdentityImage, htmlAttributes: new
-                {
-                    @type = "file",
-                    @class = "form-control",
-            @accept = "image/png, image/jpg, image/jpeg"
-                })
+           {
+               @type = "file",
+               @class = "form-control",
+               @accept = ".png,.jpg,.jpeg"
+           })
                 @Html.ValidationMessageFor(m => m.FatherIdentityImage)
             </div>
             <div class="col-md-6">
                 @Html.LabelFor(m => m.MotherIdentityImage, new { @class = "col-form-label" })
                 @Html.TextBoxFor(m => m.MotherIdentityImage, htmlAttributes: new
-                {
-                    @type = "file",
-                    @class = "form-control",
-            @accept = "image/png, image/jpg, image/jpeg"
-                })
+           {
+               @type = "file",
+               @class = "form-control",
+               @accept = ".png,.jpg,.jpeg"
+           })
                 @Html.ValidationMessageFor(m => m.MotherIdentityImage)
             </div>
             <div class="col-md-12">
                 <p id="startLocation"></p>
                 <p id="selected-coor"></p>
-                <p id="checkMobile"></p>
+                <p id="checkMobile">
+                    <strong></strong>
+                </p>
+                <p id="selected-coor-drag"></p>
             </div>
             <div id="map" class="col-md-12"></div>
+            @Html.ValidationMessageFor(m => m.Longitude)
         </div>
 
+        @Html.HiddenFor(m => m.Latitude)
+        @Html.HiddenFor(m => m.Longitude)
+        @Html.HiddenFor(m => m.Zoom)
         @Html.HiddenFor(m => m.Id)
         @Html.HiddenFor(m => m.UserId)
         <input type="submit" class="btn btn-primary" value="متابعة" id="saveBtn" />
@@ -108,6 +117,8 @@
 
     <script>
         $(document).ready(function () {
+            $("#parentForm").data("validator").settings.ignore = "";
+
             $("#saveBtn").attr("disabled", "disabled");
 
             $("#parentForm").on("blur",
@@ -120,9 +131,9 @@
                 });
 
             var form = $('#parentForm'), origForm = form.serialize();
-            $('#parentForm :input').on('change input',
+            $('#parentForm :input, #parentForm :hidden').on('change input',
                 function () {
-                    if (form.serialize() !== origForm)
+                    if (form.serialize() !== origForm && form.valid())
                         $("#saveBtn").removeAttr("disabled");
                     else
                         $("#saveBtn").attr("disabled", "disabled");
@@ -133,6 +144,22 @@
     </script>
 
     <script>
+        //Marker constructor
+        class Point {
+            constructor(longitude, latitude, zoom) {
+                this.Longitude = longitude;
+                this.Latitude = latitude;
+                this.Zoom = zoom;
+            }
+        }
+        // default location
+        //var point = new Point(36.24607370074506, 33.49884737546621, 14);
+        var point = new Point(parseFloat(@_configuration["Location:Longitude"]),
+            parseFloat(@_configuration["Location:Latitude"]), 14);
+        // location from db
+        if ($("#Longitude").val().length > 0)
+            point = new Point(parseFloat($("#Longitude").val()), parseFloat($("#Latitude").val()), parseFloat($("#Zoom").val()));
+
         //Right to left
         mapboxgl.setRTLTextPlugin(
             'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js', null, true);
@@ -145,66 +172,44 @@
         if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|ipad|iris|kindle|Android|Silk|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(navigator.userAgent)
             || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navigator.userAgent.substr(0, 4))) {
             isMobile = true;
-            document.getElementById("checkMobile").innerHTML = "جهاز موبايل";
+            $("#checkMobile > strong").text("يمكن الضغط على زر تحديد الموقع للحصول على عنوان المنزل بشكل سريع ودقيق عن طريق الجي بي اس.");
 
             //Mobile device implementation
         }
         else { /* Device is not a mobile */
-            document.getElementById("checkMobile").innerHTML = "ليس جهاز موبايل";
+            $("#checkMobile > strong").text("قد لا يعمل تحديد الموقع بالشكل الأمثل، يمكن كتابة عنوان المنطقة في صندوق البحث أو تحديدها بشكل يدوي.");
+
             var map = new mapboxgl.Map({
                 container: 'map',
                 style: 'mapbox://styles/mapbox/streets-v11',
-                // we should set kindergarten location
-                center: [36.23820724641641, 33.49254575477002], // starting position
-                zoom: 12, // starting zoom
+                // Read from DB otherwise the kindergarten location will be viewed
+                center: [point.Longitude, point.Latitude], // starting position
+                zoom: point.Zoom, // starting zoom
                 attributionControl: false  //remove the standard attribute
+
             });
-            //Attribute
+
+            //Home address marker
+            var userHomeAdress = new mapboxgl.Marker({
+                color: "#0B0BF3",
+                draggable: false
+            }).setLngLat([point.Longitude, point.Latitude])
+                .setPopup(new mapboxgl.Popup().setHTML("<h4>عنوان المنزل</h4>"))
+                .addTo(map);
+            userHomeAdress.togglePopup();
+
+            //Attribute label
             map.addControl(new mapboxgl.AttributionControl({ // add costume attribute
                 customAttribution: 'روضة السعادة'
             }));
-            ////////////
-            /////////////
 
-            /////////////////////////////////Start Point///////////////////////////////////
-
-            // Create and set marker options.
-            //Start
-            var marker = new mapboxgl.Marker({
-                color: "#FF0000",
-                draggable: true
-            }).setLngLat([36.2773096456465, 33.513856545654654])
-                .setPopup(new mapboxgl.Popup().setHTML("<h4>موقع المنزل</h4>"))
-                .addTo(map);
-            marker.togglePopup(); // toggle popup open or closed
-            //console.log(`Longitude: ${lngLat.lng}, Latitude: ${lngLat.lat}`);
-
-            // Store the initiated coors marker's longitude and latitude coordinates in a variable
-            var lngLat = marker.getLngLat();
-
-
-            //View the coors
-            document.getElementById("startLocation").innerHTML = "Start location view coordinates: " + `Longitude: ${lngLat.lng}, Latitude: ${lngLat.lat}`;
-
-
-
-
-            /////////////////////////////////End Point///////////////////////////////////
-
-            //Target
-            var marker2 = new mapboxgl.Marker({
-                color: "#0B0BF3",
-                draggable: true
-            }).setLngLat([36.2773096, 33.4838565])
-                .setPopup(new mapboxgl.Popup().setHTML("<h4>منزل</h4>"))
-                .addTo(map);
-            marker2.togglePopup(); // toggle popup open or closed
-
-
-
-
-
-
+            ///////////////////////////////Adding map tools for searching and setting home address \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+            //Add search
+            var geocoder = new MapboxGeocoder({
+                accessToken: mapboxgl.accessToken,
+                language: 'ar-SA', // Specify the language as Arabic.
+                mapboxgl: mapboxgl
+            }).addTo(map);
             //add location controls
             map.addControl(new mapboxgl.GeolocateControl({
                 positionOptions: {
@@ -213,44 +218,11 @@
                 trackUserLocation: true,
                 showUserHeading: true
             }));
-
-
-
-
-
             //  Add zoom and rotation controls to the map.
             map.addControl(new mapboxgl.NavigationControl());
             //Full screen availabilty
             map.addControl(new mapboxgl.FullscreenControl());
-
-
-            ////nav
-            //map.addControl(
-            //    new MapboxDirections({
-            //        accessToken: mapboxgl.accessToken, unit: 'metric', profile: 'cycling', interactive: true,
-            //    }),
-            //    'top-left'
-            //);
-
-
-
-
-
-            //     var popup =  new mapboxgl.Popup()
-            //.setLngLat([36.2773096, 33.4538565])
-            //.setHTML("<h3>ملاحظات عن المنطقة</h3>")
-            //.addTo(map);
-
-
-            //Add search
-            var geocoder = new MapboxGeocoder({
-                accessToken: mapboxgl.accessToken,
-                language: 'ar-SA', // Specify the language as Arabic.
-                mapboxgl: mapboxgl
-            }).addTo(map);
-
-
-
+            /////////////////////////////// End of adding map tools for searching and setting home address \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
             //Scale
             var scale = new mapboxgl.ScaleControl({
@@ -261,72 +233,27 @@
             // scale.setUnit('metric');
         }//end device else
 
-
-        if ("geolocation" in navigator) {
-
-        } else { /* No location, handling that issue */
-
-
-
-        }//end else
-
-
-        ///////////////
-        /////////////
-
-
-        // Add note to the mouse pointer
-        var popup = new mapboxgl.Popup({ closeOnClick: false, closeButton: false })
-            .setHTML("<h4>توجيهات للعملية الحالية</h4>")
-            .trackPointer()
-            .addTo(map);
-
-        ////////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-        //var directions = new MapboxDirections();
-        // show navigation control and set the target and destination
-        map.on('load', function () {
-            directions = new MapboxDirections({
-                accessToken: mapboxgl.accessToken, unit: 'metric', language: 'ar',
-            });
-            map.addControl(directions, 'top-left');
-            console.log("Hello World!");
-            console.log(directions);
-            //draw the path
-            directions.setOrigin([lngLat['lng'], lngLat['lat']]);
-            directions.setDestination([36.2773096, 33.4838565]);
-        });
-
         //View the coors dynamically
         function onMapClick(e) {
-            // alert("You clicked the map at " + e.lngLat);
-            console.log(e.lngLat.lng, e.lngLat.lat);
+            // set
+            $("#Longitude").val(e.lngLat.lng).change();
+            $("#Latitude").val(e.lngLat.lat).change();
+            $("#Zoom").val(map.getZoom()).change();
+            //View some data when clicking on the map
             document.getElementById("selected-coor").innerHTML = "Selected coordinates by mouse click: " + "Longitude: " + e.lngLat.lng + " || Latitude: " + e.lngLat.lat;
-            directions.setDestinaion([e.lngLat.lng, e.lngLat.lat]);
-
-
-
         }
 
+        //Setting marker on mouse click event
         map.on('click', onMapClick);
+        map.on('click', add_marker);
+        map.on('onmouseover', map.getCanvas().style.cursor = 'crosshair');
 
+        // Creating a marker when clcking on the map if there is no location loaded from DB
+        function add_marker(event) {
 
-
-
-
-
-
-
-
-
-
-
+            var coordinates = event.lngLat;
+            userHomeAdress.setLngLat(coordinates).addTo(map);
+        }
 
     </script>
 }

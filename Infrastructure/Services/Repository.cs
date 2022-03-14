@@ -7,10 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using KiddieParadies.Core.Models;
 
 namespace KiddieParadies.Infrastructure.Services
 {
-    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : Entity
     {
         private readonly ApplicationDbContext _dbContext;
         protected readonly DbSet<TEntity> DbSet;
@@ -34,9 +35,12 @@ namespace KiddieParadies.Infrastructure.Services
             return await query.ToListAsync();
         }
 
-        public virtual async Task<TEntity> GetByIdAsync(int id)
+        public virtual async Task<TEntity> GetByIdAsync(int id, params Expression<Func<TEntity, object>>[] includeProperties)
         {
-            return await DbSet.FindAsync(id);
+            IQueryable<TEntity> query = DbSet;
+            query = query.IncludeEntities(includeProperties);
+
+            return await query.FirstOrDefaultAsync(te => te.Id == id);
         }
 
         public virtual async Task AddAsync(TEntity entity)

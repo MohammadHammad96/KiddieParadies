@@ -114,7 +114,7 @@
             var form = $('#BlogForm'), origForm = form.serialize();
             $('#blogForm :input').on('change input',
                 function () {
-                    if (form.serialize() !== origForm)
+                    if (form.serialize() !== origForm && form.valid())
                         $("#saveBtn").removeAttr("disabled");
                     else
                         $("#saveBtn").attr("disabled", "disabled");

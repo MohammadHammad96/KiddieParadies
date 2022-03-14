@@ -26,12 +26,30 @@ namespace KiddieParadies.Mapping
             CreateMap<EmployeeRegistrationInfoDto, EmployeeRegistrationInfo>();
 
             CreateMap<BlogFormViewModel, Blog>();
-            CreateMap<ParentFormViewModel, Parent>();
+            CreateMap<ParentFormViewModel, Parent>()
+                .ForMember(p => p.FatherIdentityImageName, opt => opt.Ignore())
+                .ForMember(p => p.MotherIdentityImageName, opt => opt.Ignore())
+                .BeforeMap((vm, p) =>
+                {
+                    p.HomeLocation.Longitude = vm.Longitude;
+                    p.HomeLocation.Latitude = vm.Latitude;
+                    p.HomeLocation.Zoom = vm.Zoom;
+                });
             CreateMap<StudentFormViewModel, Student>();
+            CreateMap<EmployeeFormViewModel, Employee>()
+                .ForMember(e => e.ImageName, opt => opt.Ignore())
+                .ForMember(e => e.ResumeName, opt => opt.Ignore());
 
             CreateMap<Blog, BlogFormViewModel>();
-            CreateMap<Parent, ParentFormViewModel>();
+            CreateMap<Parent, ParentFormViewModel>()
+                .BeforeMap((p, vm) =>
+                {
+                    vm.Longitude = p.HomeLocation.Longitude;
+                    vm.Latitude = p.HomeLocation.Latitude;
+                    vm.Zoom = p.HomeLocation.Zoom;
+                });
             CreateMap<Student, StudentFormViewModel>();
+            CreateMap<Employee, EmployeeFormViewModel>();
         }
     }
 }

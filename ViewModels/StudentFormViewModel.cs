@@ -23,7 +23,7 @@ namespace KiddieParadies.ViewModels
 
         [DisplayName("الصورة")]
         [RequiredFile("Id")]
-        [Image]
+        [FileType("jpeg", "jpg", "png")]
         public IFormFile Image { get; set; }
 
         [DisplayName("الجنس")]

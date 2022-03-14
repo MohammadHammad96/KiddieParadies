@@ -179,6 +179,105 @@ namespace KiddieParadies.Data.Migrations
                     b.ToTable("Blogs");
                 });
 
+            modelBuilder.Entity("KiddieParadies.Core.Models.Certificate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("ImageName")
+                        .IsUnique();
+
+                    b.ToTable("Certificates");
+                });
+
+            modelBuilder.Entity("KiddieParadies.Core.Models.Course", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Courses");
+                });
+
+            modelBuilder.Entity("KiddieParadies.Core.Models.Employee", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("BirthDate")
+                        .HasColumnType("Date");
+
+                    b.Property<string>("ExperienceSummary")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ImageName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsMale")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsValid")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("ResumeName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ImageName")
+                        .IsUnique();
+
+                    b.HasIndex("ResumeName")
+                        .IsUnique();
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Employees");
+                });
+
             modelBuilder.Entity("KiddieParadies.Core.Models.EmployeeRegistrationInfo", b =>
                 {
                     b.Property<int>("Id")
@@ -211,6 +310,89 @@ namespace KiddieParadies.Data.Migrations
                     b.ToTable("EmployeeRegistrationsInfos");
                 });
 
+            modelBuilder.Entity("KiddieParadies.Core.Models.Level", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("Order")
+                        .IsUnique();
+
+                    b.ToTable("Levels");
+                });
+
+            modelBuilder.Entity("KiddieParadies.Core.Models.LevelCourse", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LevelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("YearId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("LevelId");
+
+                    b.HasIndex("YearId", "CourseId", "LevelId")
+                        .IsUnique();
+
+                    b.ToTable("LevelCourses");
+                });
+
+            modelBuilder.Entity("KiddieParadies.Core.Models.Location", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Latitude")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Longitude")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ParentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Zoom")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentId")
+                        .IsUnique();
+
+                    b.ToTable("Location");
+                });
+
             modelBuilder.Entity("KiddieParadies.Core.Models.Parent", b =>
                 {
                     b.Property<int>("Id")
@@ -220,7 +402,7 @@ namespace KiddieParadies.Data.Migrations
 
                     b.Property<string>("FatherIdentityImageName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("FatherLastName")
                         .IsRequired()
@@ -239,12 +421,18 @@ namespace KiddieParadies.Data.Migrations
 
                     b.Property<string>("MotherIdentityImageName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FatherIdentityImageName")
+                        .IsUnique();
+
+                    b.HasIndex("MotherIdentityImageName")
+                        .IsUnique();
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -269,7 +457,7 @@ namespace KiddieParadies.Data.Migrations
 
                     b.Property<string>("ImageName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsMale")
                         .HasColumnType("bit");
@@ -281,6 +469,9 @@ namespace KiddieParadies.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ImageName")
+                        .IsUnique();
 
                     b.HasIndex("ParentId");
 
@@ -344,6 +535,35 @@ namespace KiddieParadies.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("Years");
+                });
+
+            modelBuilder.Entity("KiddieParadies.Core.Models.YearEmployee", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("FromDate")
+                        .HasColumnType("Date");
+
+                    b.Property<DateTime?>("ToDate")
+                        .HasColumnType("Date");
+
+                    b.Property<int>("YearId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("YearId", "EmployeeId")
+                        .IsUnique();
+
+                    b.ToTable("YearEmployees");
                 });
 
             modelBuilder.Entity("KiddieParadies.Core.Models.YearStudent", b =>
@@ -489,6 +709,28 @@ namespace KiddieParadies.Data.Migrations
                     b.Navigation("Year");
                 });
 
+            modelBuilder.Entity("KiddieParadies.Core.Models.Certificate", b =>
+                {
+                    b.HasOne("KiddieParadies.Core.Models.Employee", "Employee")
+                        .WithMany("Certificates")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("KiddieParadies.Core.Models.Employee", b =>
+                {
+                    b.HasOne("KiddieParadies.Core.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("KiddieParadies.Core.Models.EmployeeRegistrationInfo", b =>
                 {
                     b.HasOne("KiddieParadies.Core.Models.Year", "Year")
@@ -498,6 +740,44 @@ namespace KiddieParadies.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Year");
+                });
+
+            modelBuilder.Entity("KiddieParadies.Core.Models.LevelCourse", b =>
+                {
+                    b.HasOne("KiddieParadies.Core.Models.Course", "Course")
+                        .WithMany("CourseLevels")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KiddieParadies.Core.Models.Level", "Level")
+                        .WithMany("LevelCourses")
+                        .HasForeignKey("LevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KiddieParadies.Core.Models.Year", "Year")
+                        .WithMany("LevelCourses")
+                        .HasForeignKey("YearId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Level");
+
+                    b.Navigation("Year");
+                });
+
+            modelBuilder.Entity("KiddieParadies.Core.Models.Location", b =>
+                {
+                    b.HasOne("KiddieParadies.Core.Models.Parent", "Parent")
+                        .WithOne("HomeLocation")
+                        .HasForeignKey("KiddieParadies.Core.Models.Location", "ParentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Parent");
                 });
 
             modelBuilder.Entity("KiddieParadies.Core.Models.Parent", b =>
@@ -529,6 +809,25 @@ namespace KiddieParadies.Data.Migrations
                         .HasForeignKey("YearId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Year");
+                });
+
+            modelBuilder.Entity("KiddieParadies.Core.Models.YearEmployee", b =>
+                {
+                    b.HasOne("KiddieParadies.Core.Models.Employee", "Employee")
+                        .WithMany("EmployeeYears")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KiddieParadies.Core.Models.Year", "Year")
+                        .WithMany()
+                        .HasForeignKey("YearId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
 
                     b.Navigation("Year");
                 });
@@ -603,8 +902,33 @@ namespace KiddieParadies.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("KiddieParadies.Core.Models.Course", b =>
+                {
+                    b.Navigation("CourseLevels");
+                });
+
+            modelBuilder.Entity("KiddieParadies.Core.Models.Employee", b =>
+                {
+                    b.Navigation("Certificates");
+
+                    b.Navigation("EmployeeYears");
+                });
+
+            modelBuilder.Entity("KiddieParadies.Core.Models.Level", b =>
+                {
+                    b.Navigation("LevelCourses");
+                });
+
+            modelBuilder.Entity("KiddieParadies.Core.Models.Parent", b =>
+                {
+                    b.Navigation("HomeLocation")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("KiddieParadies.Core.Models.Year", b =>
                 {
+                    b.Navigation("LevelCourses");
+
                     b.Navigation("StudentRegistrationInfos");
                 });
 #pragma warning restore 612, 618

@@ -2,9 +2,8 @@ using System;
 
 namespace KiddieParadies.Core.Models
 {
-    public class EmployeeRegistrationInfo
+    public class EmployeeRegistrationInfo : Entity
     {
-        public int Id { get; set; }
         public int YearId { get; set; }
 
         public Year Year { get; set; }

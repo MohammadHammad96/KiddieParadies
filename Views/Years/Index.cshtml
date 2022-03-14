@@ -142,22 +142,6 @@
         عام دراسي
         جديد
     </button>
-
-    <div class="toast-container position-fixed end-0 p-3" style="top: 60px !important;">
-
-        <div class="toast fade hide" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-                <img src="/Logo.png" style="width: 40px;" class="rounded me-2" alt="روضة السعادة">
-                <strong class="me-auto">روضة السعادة</strong>
-                <small class="text-muted">الآن</small>
-                <button type="button" id="toastBtn" class="btn-close" data-bs-dismiss="toast"
-                        aria-label="Close"></button>
-            </div>
-            <div class="toast-body" id="notification">
-                تمت إضافة العام الدراسي بنجاح.
-            </div>
-        </div>
-    </div>
 </section>
 <section class="table-responsive">
     <table id="info" class="table align-middle display">
@@ -574,7 +558,7 @@
 
         $('#manageYears :input').on('change input',
             function () {
-                if (form.serialize() !== origForm)
+                if (form.serialize() !== origForm && form.valid())
                     $("#addBtn").removeAttr("disabled");
                 else
                     $("#addBtn").attr("disabled", "disabled");

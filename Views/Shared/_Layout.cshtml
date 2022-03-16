@@ -67,14 +67,15 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">الخصوصية</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Years" asp-action="Index">الأعوام الدراسية</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="StudentRegistrationInfos" asp-action="Index">مواعيد تسجيل الطلاب</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="EmployeeRegistrationInfos" asp-action="Index">مواعيد تسجيل الموظفين</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                الأعوام والشواغر
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <li><a class="dropdown-item" asp-controller="Years" asp-action="Index">الأعوام الدراسية</a></li>
+                                <li><a class="dropdown-item" asp-controller="StudentRegistrationInfos" asp-action="Index">مواعيد تسجيل الطلاب</a></li>
+                                <li><a class="dropdown-item" asp-controller="EmployeeRegistrationInfos" asp-action="Index">مواعيد تسجيل الموظفين</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -99,13 +100,13 @@
     </header>
     <div class="container">
         <div id="messages"
-             style="background-color: #ffb6c1; border: black solid 0.75px; border-radius: 5px; width: 350px; height: 450px; position: absolute; display: none; top: 75px;">
+             style="background-color: #ffb6c1; border: black solid 0.75px; border-radius: 5px; width: 350px; height: 450px; position: absolute; display: none; top: 75px; z-index: 9;">
             <p style="font-size: x-large; margin: 5px 10px 0px 0px;">
                 المحادثات
             </p>
         </div>
         <div id="notifications"
-             style="background-color: #ffb6c1; border: black solid 0.75px; border-radius: 5px; width: 350px; height: 450px; position: absolute; display: none; top: 75px;">
+             style="background-color: #ffb6c1; border: black solid 0.75px; border-radius: 5px; width: 350px; height: 450px; position: absolute; display: none; top: 75px; z-index: 9;">
             <p style="font-size: x-large; margin: 5px 10px 0px 0px;">
                 الإشعارات
             </p>

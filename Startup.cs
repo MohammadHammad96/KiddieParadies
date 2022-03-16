@@ -1,6 +1,7 @@
 using KiddieParadies.Core.Helpers;
 using KiddieParadies.Core.Models;
 using KiddieParadies.Core.Services;
+using KiddieParadies.Hubs;
 using KiddieParadies.Infrastructure.Data;
 using KiddieParadies.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
@@ -68,11 +69,17 @@ namespace KiddieParadies
             services.AddScoped<IImagesRepository, ImagesRepository>();
             services.AddScoped<IFilesRepository, FilesRepository>();
             services.AddScoped<IRepository<Employee>, Repository<Employee>>();
+            services.AddScoped<IRepository<YearEmployee>, Repository<YearEmployee>>();
             services.AddScoped<IRepository<Level>, Repository<Level>>();
             services.AddScoped<IRepository<Course>, Repository<Course>>();
             services.AddScoped<IRepository<LevelCourse>, Repository<LevelCourse>>();
+            services.AddScoped<IRepository<CourseClassRoom>, Repository<CourseClassRoom>>();
+            services.AddScoped<IRepository<Message>, Repository<Message>>();
 
             services.AddAutoMapper(typeof(Startup));
+
+            services.AddSignalR();
+            services.AddSingleton<IUserConnectionManager, UserConnectionManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -114,6 +121,8 @@ namespace KiddieParadies
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
+
+                endpoints.MapHub<NotificationUserHub>("/NotificationUserHub");
             });
         }
     }

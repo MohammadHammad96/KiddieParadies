@@ -1,4 +1,5 @@
 using AutoMapper;
+using KiddieParadies.Controllers.Apis;
 using KiddieParadies.Controllers.Apis.Dtos;
 using KiddieParadies.Core.Models;
 using KiddieParadies.ViewModels;
@@ -20,10 +21,16 @@ namespace KiddieParadies.Mapping
                 {
                     ed.YearName = e.Year.Name;
                 });
+            CreateMap<Message, MessageDto>();
+
 
             CreateMap<YearDto, Year>();
             CreateMap<StudentRegistrationInfoDto, StudentRegistrationInfo>();
             CreateMap<EmployeeRegistrationInfoDto, EmployeeRegistrationInfo>();
+            CreateMap<ClassRoomCourseSaveDto, CourseClassRoom>()
+                .ForMember(c => c.Id, opt => opt.Ignore());
+            CreateMap<MessageDto, Message>()
+                .ForMember(i => i.Id, opt => opt.Ignore());
 
             CreateMap<BlogFormViewModel, Blog>();
             CreateMap<ParentFormViewModel, Parent>()

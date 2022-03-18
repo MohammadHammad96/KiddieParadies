@@ -21,8 +21,10 @@ namespace KiddieParadies.Controllers.Apis
         private readonly IRepository<CourseClassRoom> _courseClassRoomRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IRepository<Level> _levelRepository;
+        private readonly IRepository<Student> _studentRepository;
 
-        public WeekProgramController(IRepository<Year> yearRepository, IRepository<LevelCourse> levelCourseRepository, IRepository<YearEmployee> employeeRepository, IRepository<CourseClassRoom> courseClassRoomRepository, IMapper mapper, IUnitOfWork unitOfWork)
+        public WeekProgramController(IRepository<Year> yearRepository, IRepository<LevelCourse> levelCourseRepository, IRepository<YearEmployee> employeeRepository, IRepository<CourseClassRoom> courseClassRoomRepository, IMapper mapper, IUnitOfWork unitOfWork, IRepository<Level> levelRepository, IRepository<Student> studentRepository)
         {
             _yearRepository = yearRepository;
             _levelCourseRepository = levelCourseRepository;
@@ -30,6 +32,8 @@ namespace KiddieParadies.Controllers.Apis
             _courseClassRoomRepository = courseClassRoomRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _levelRepository = levelRepository;
+            _studentRepository = studentRepository;
         }
 
         [HttpGet("levelClassRoomCoursesAndTeacher")]
@@ -111,6 +115,51 @@ namespace KiddieParadies.Controllers.Apis
                 await _courseClassRoomRepository.AddAsync(courseClassRoom);
 
             return await _unitOfWork.SaveChangesAsync() > 0 ? Ok() : StatusCode(StatusCodes.Status500InternalServerError, "يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً.");
+        }
+
+        [HttpGet("enrollStudentsRandomly")]
+        public async Task<IActionResult> EnrollStudentsRandomly()
+        {
+            var levels = await _levelRepository.GetAsync();
+
+            foreach (var level in levels)
+            {
+                var classRooms = await _courseClassRoomRepository
+                    .GetAsync(cr => cr.Course.LevelId == level.Id);
+
+                var classRoomNumbers = classRooms.Select(cr => new
+                {
+                    cr.ClassRoom
+                }).Distinct().ToList();
+
+                if (!classRoomNumbers.Any())
+                {
+                    var studentList = await _studentRepository.GetAsync(s => s.Level == level.Id);
+                    if (!studentList.Any())
+                        continue;
+
+                    foreach (var student in studentList)
+                        student.ClassRoom = 0;
+
+                    continue;
+                }
+
+                var students = await _studentRepository.GetAsync(s => s.Level == level.Id);
+                int j = 0;
+                for (int i = 0; i < classRoomNumbers.Count; i++)
+                {
+                    students.ElementAt(j).ClassRoom = classRoomNumbers.ElementAt(i).ClassRoom;
+                    if (j == (students.Count() - 1))
+                        break;
+                    j++;
+                    if (i == (classRoomNumbers.Count - 1))
+                        i = -1;
+                }
+            }
+
+            if (await _unitOfWork.SaveChangesAsync() > 0)
+                return Ok();
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 }

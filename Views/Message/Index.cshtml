@@ -1,0 +1,351 @@
+﻿@{
+    ViewData["title"] = "المحادثات";
+}
+
+@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@using KiddieParadies.Core.Models
+@inject SignInManager<ApplicationUser> _signInManager
+
+@if (_signInManager.IsSignedIn(User))
+{
+    @section styles
+    {
+        <style>
+            .chat-main {
+                position: fixed;
+                width: 270px;
+                bottom: 0;
+                right: 200px;
+            }
+
+            .chat-header {
+                background: #4267B2;
+                padding-top: 1px;
+                padding-bottom: 1px;
+            }
+
+            .username i {
+                font-size: 9px;
+            }
+
+            .username h6 {
+                display: inline-block;
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            .options i {
+                font-size: 14px;
+                font-weight: normal;
+                opacity: 0.7;
+            }
+
+            .options .live-video {
+                font-size: 6px;
+            }
+
+            .chats {
+                height: 260px;
+                overflow-x: scroll;
+                overflow-x: hidden;
+            }
+
+                .chats ul li {
+                    list-style: none;
+                    clear: both;
+                    font-size: 13px;
+                }
+
+                .chats .send-msg {
+                    float: right;
+                }
+
+            .receive-msg img {
+                border-radius: 100%;
+                height: 30px;
+                width: 12%;
+            }
+
+            .receive-msg-img {
+                display: inline;
+            }
+
+            .receive-msg .receive-msg-desc {
+                display: inline-block;
+            }
+
+                .receive-msg .receive-msg-desc p {
+                    background: #c1c1c1;
+                }
+
+            .message-box input {
+                border: none;
+                font-size: 13px;
+                opacity: 0.7;
+            }
+
+                .message-box input:focus {
+                    outline: none;
+                }
+
+            .tools i {
+                color: #a1a1a1;
+                cursor: pointer;
+                font-size: 20px;
+                margin-right: 6px;
+            }
+        </style>
+    }
+    <input type="hidden" id="signalRConnectionId" />
+
+    <form class="form-group" id="messageForm">
+        <label class="form-control" for="message">Message</label>
+        <textarea class="form-control" name="message" id="message" required="required"></textarea>
+        <input class="form-control btn btn-primary" type="submit" value="Send" id="send" disabled="disabled" />
+    </form>
+
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>User Name</th>
+                <th>Chat</th>
+            </tr>
+        </thead>
+        <tbody>
+            @*@foreach (var user in @Model)
+                {
+                    <tr>
+                        <td id="@user.Id">@user.Id</td>
+                        <td class="username" style="cursor: pointer">@user.UserName</td>
+                        <td><div id="chat_@user.Id"></div></td>
+                    </tr>
+                }*@
+        </tbody>
+    </table>
+
+
+    <div class="container">
+        <div class="row pt-3">
+            <div class="chat-main">
+                <div class="col-md-12 chat-header rounded-top bg-primary text-white">
+                    <div class="row">
+                        <div class="col-md-6 username pl-2">
+                            <i class="fa fa-circle text-success" aria-hidden="true"></i>
+                            <h6 class="m-0">Adam Finn</h6>
+                        </div>
+                        <div class="col-md-6 options text-right pr-2">
+                            <i class="fa fa-times hide-chat-box" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-content">
+                    <div class="col-md-12 chats border">
+                        <ul class="p-0">
+                            <li class="pl-2 pr-2 bg-primary rounded text-white text-center send-msg mb-1">
+                                hiii
+                            </li>
+                            <li class="p-1 rounded mb-1">
+                                <div class="receive-msg">
+                                    <img src="http://nicesnippets.com/demo/image1.jpg">
+                                    <div class="receive-msg-desc text-center mt-1 ml-1 pl-2 pr-2">
+                                        <p class="pl-2 pr-2 rounded">hello</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="pl-2 pr-2 bg-primary rounded text-white text-center send-msg mb-1">
+                                how are you ???
+                            </li>
+                            <li class="p-1 rounded mb-1">
+                                <div class="receive-msg">
+                                    <div class="receive-msg-img">
+                                        <img src="http://nicesnippets.com/demo/image1.jpg">
+                                    </div>
+                                    <div class="receive-msg-desc rounded text-center mt-1 ml-1 pl-2 pr-2">
+                                        <p class="mb-0 mt-1 pl-2 pr-2 rounded-top rounded-right">I'm fine !!!</p>
+                                        <p class="mb-0 mt-1 pl-2 pr-2 rounded-bottom rounded-right">Where are you ?</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="pl-2 pr-2 bg-primary text-white text-center send-msg mb-1 rounded-top rounded-left">
+                                at california
+                            </li>
+                            <li class="pl-2 pr-2 bg-primary text-white text-center send-msg mb-1 rounded-bottom rounded-left">
+                                and where are you ?
+                            </li>
+                            <li class="p-1 rounded mb-1">
+                                <div class="receive-msg">
+                                    <img src="http://nicesnippets.com/demo/image1.jpg">
+                                    <div class="receive-msg-desc rounded text-center mt-1 ml-1 pl-2 pr-2">
+                                        <p class="pl-2 pr-2 rounded">now i'm at new york city</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="pl-2 pr-2 bg-primary rounded text-white text-center send-msg mb-1">
+                                Ok
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-12 message-box border pl-2 pr-2 border-top-0">
+                        <input type="text" class="pl-0 pr-0 w-100" style="width: 90% !important; /*word-wrap: break-spaces;*/" placeholder="Type a message..." />
+                        <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section scripts{
+        <script src="lib/signalr/signalr.js"></script>
+
+        <script>
+            var receiverId = null, userId = "@User.Claims.First(u => u.Type == ClaimTypes.NameIdentifier).Value";
+
+
+            var formatDate = function (date) {
+                date = date.split('T');
+                var result = date[0].split('-')[2] + '-' + date[0].split('-')[1] + '-' + date[0].split('-')[0];
+                date = date[1].split(':');
+                result += ' ' + date[0] + ':' + date[1];
+                return result;
+            }
+
+            $.ajax({
+                type: "GET",
+                url: "/api/chat/getUsers",
+                success: function (users, status, xhr) {
+                    var rows = "";
+                    for (var i = 0; i < users.length; i++) {
+                        rows += "<tr><td class='username' id='" + users[i].id + "' style='cursor: pointer'>" + users[i].name + "</td>";
+                        rows += "<td><div id='chat_" + users[i].id + "'></div></td></tr>";
+                    }
+                    $("table tbody").html(rows);
+
+                    $(".username").each(function () {
+                        var secondUserId = $(this).attr("id");
+                        $.ajax({
+                            type: "GET",
+                            url: "/api/chat/getChat/" + secondUserId,
+                            success: function (users, status, xhr) {
+                                var rows = "";
+                                for (var i = 0; i < users.length; i++) {
+                                    rows += "<p title='sent at " + formatDate(users[i].time) + "'>";
+                                    if (users[i].senderId == userId)
+                                        rows += "from me";
+                                    else
+                                        rows += "from him";
+                                    rows += ": " + users[i].content + "</p><hr/>";
+
+                                }
+                                $("#chat_" + secondUserId).html(rows);
+                            },
+                            error: function (data, status, xhr) {
+                                console.log("status: ", status);
+                                console.log("statusCode: ", xhr.status);
+                                for (var item in xhr.responseJSON)
+                                    console.log(item + ": " + xhr.responseJSON[item]);
+                            }
+                        });
+                    });
+                },
+                error: function (data, status, xhr) {
+                    console.log("status: ", status);
+                    console.log("statusCode: ", xhr.status);
+                    for (var item in xhr.responseJSON)
+                        console.log(item + ": " + xhr.responseJSON[item]);
+                }
+            });
+
+
+
+
+            $("table").on("click", "td.username", function (e) {
+                if (receiverId == null) {
+                    receiverId = $(this).attr("id");
+                    $(this).css("background-color", "#AAA");
+                } else {
+                    if ($(this).attr("id") == receiverId) {
+                        receiverId = null;
+                        $(this).css("background-color", "");
+                    } else {
+                        $("#" + receiverId).css("background-color", "");
+                        receiverId = $(this).attr("id");
+                        $(this).css("background-color", "#AAA");
+                    }
+                }
+                if (receiverId == null)
+                    $("#send").attr("disabled", "disabled");
+                else
+                    $("#send").removeAttr("disabled");
+
+            });
+
+            $("#messageForm").submit(function (e) {
+                e.preventDefault();
+                if (receiverId != null && userId != null) {
+                    $.ajax({
+                        type: "POST",
+                        contentType: "application/json",
+                        url: "/api/chat/send",
+                        data: JSON.stringify({
+                            receiverId: receiverId,
+                            senderId: userId,
+                            content: $("#message").val()
+                        }),
+                        success: function (message, status, xhr) {
+                            $("#message").val("");
+                            $("#chat_" + receiverId).html($("#chat_" + receiverId).html() +
+                                "<p title='sent at" + formatDate(message.time) + "'> from me: " + message.content + "</p><hr/>");
+                            console.log("status: ", status);
+                            console.log("statusCode: ", xhr.status);
+                            for (var item in xhr.responseJSON)
+                                console.log(item + ": " + xhr.responseJSON[item]);
+                        },
+                        error: function (data, status, xhr) {
+                            console.log("error");
+                        }
+                    });
+                }
+            });
+
+            var connection = new signalR.HubConnectionBuilder().withUrl("/NotificationUserHub?userId=" + userId).build();
+            connection.on("sendToUser", (messageResource) => {
+                if (Notification.permission === "granted") {
+                    // If it's okay let's create a notification
+                    var notification = new Notification("New message");
+                }
+
+                // Otherwise, we need to ask the user for permission
+                else if (Notification.permission !== "denied") {
+                    Notification.requestPermission().then(function (permission) {
+                        // If the user accepts, let's create a notification
+
+                    });
+                }
+                //console.log(messageResource);
+                $("#chat_" + messageResource.senderId).html($("#chat_" + messageResource.senderId).html() +
+                    "<p title='sent at" + formatDate(messageResource.time) + "'> from me: " + messageResource.content + "</p><hr/>");
+            });
+            connection.start().catch(function (err) {
+                return console.error(err.toString());
+            }).then(function () {
+                connection.invoke('GetConnectionId').then(function (connectionId) {
+                    $("#signalRConnectionId").val(connectionId);
+                });
+            });
+
+            if (!("Notification" in window)) {
+                alert("This browser does not support desktop notification");
+            }
+
+
+        </script>
+
+        <script>
+            $('.hide-chat-box').click(function () {
+                $('.chat-content').slideToggle();
+            });
+        </script>
+    }
+}

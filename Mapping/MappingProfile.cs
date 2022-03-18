@@ -38,11 +38,13 @@ namespace KiddieParadies.Mapping
                 .ForMember(p => p.MotherIdentityImageName, opt => opt.Ignore())
                 .BeforeMap((vm, p) =>
                 {
+                    p.HomeLocation = new Location();
                     p.HomeLocation.Longitude = vm.Longitude;
                     p.HomeLocation.Latitude = vm.Latitude;
                     p.HomeLocation.Zoom = vm.Zoom;
                 });
-            CreateMap<StudentFormViewModel, Student>();
+            CreateMap<StudentFormViewModel, Student>()
+                .ForMember(s => s.ImageName, opt => opt.Ignore());
             CreateMap<EmployeeFormViewModel, Employee>()
                 .ForMember(e => e.ImageName, opt => opt.Ignore())
                 .ForMember(e => e.ResumeName, opt => opt.Ignore());

@@ -1,0 +1,459 @@
+﻿@model IEnumerable<KiddieParadies.ViewModels.StudentListViewModel>
+
+@{
+    ViewData["title"] = "الطلاب";
+}
+
+@section styles
+{
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css">
+    <style>
+        section {
+            margin-bottom: 15px;
+            padding: 1%;
+        }
+
+        body section:first-of-type {
+            padding: 0px !important;
+        }
+
+        .fa-trash {
+            color: red;
+        }
+
+        .fa-edit {
+            color: #55FF1A;
+        }
+
+        .fas {
+            font-size: 21px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        a img {
+            height: 35px;
+        }
+
+        .bg-light {
+            background-color: #FFFEB0 !important;
+        }
+
+        @@media only screen and (max-width: 760px) {
+            /* Force table to not be like tables anymore */
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+            }
+                /* Hide table headers (but not display: none;, for accessibility) */
+                thead tr {
+                    /*position: absolute;
+            top: -9999px;
+            left: -9999px;*/
+                    display: none;
+                }
+
+            tr {
+                border: 1px solid #ccc;
+            }
+
+            td {
+                /* Behave  like a "row" */
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-right: 50% !important;
+            }
+
+                td:before {
+                    /* Now like a table header */
+                    position: absolute;
+                    /* Top/left values mimic padding */
+                    top: 6px;
+                    right: 6px;
+                    width: 45%;
+                    padding-left: 10px;
+                    white-space: nowrap;
+                }
+                /*
+        Label the data
+        */
+
+                td:nth-of-type(1):before {
+                    content: "الاسم";
+                }
+
+                td:nth-of-type(2):before {
+                    content: "تاريخ الميلاد";
+                }
+
+                td:nth-of-type(3):before {
+                    content: "اسم الأب";
+                }
+
+                td:nth-of-type(4):before {
+                    content: "اسم الأم";
+                }
+
+                td:nth-of-type(5):before {
+                    content: "الصورة الشخصية";
+                }
+
+                td:nth-of-type(6):before {
+                    content: "صفحة الأب بدفتر العائلة";
+                }
+
+                td:nth-of-type(7):before {
+                    content: "صفحة الأم بدفتر العائلة";
+                }
+
+                td:nth-of-type(8):before {
+                    content: "الجنس";
+                }
+
+                td:nth-of-type(9):before {
+                    content: "حالة البيانات";
+                }
+
+                td:nth-of-type(10):before {
+                    content: "حالة بيانات الاهل";
+                }
+
+                td:nth-of-type(11):before {
+                    content: "إدارة بيانات الطالب";
+                }
+
+                td:nth-of-type(12):before {
+                    content: "إدارة بيانات أولياء الأمر";
+                }
+        }
+
+        .toast-container {
+            top: 55px !important;
+        }
+
+        .field-validation-error {
+            color: #F00;
+        }
+
+        .odd {
+            background-color: #F2F0FD;
+        }
+
+        td {
+            border: 1px solid white !important;
+        }
+
+        input {
+            direction: rtl !important;
+            text-align: right !important;
+        }
+    </style>
+}
+
+@if (Model.Any())
+{
+    <section class="table-responsive">
+        <table id="info" class="table align-middle display">
+            <thead>
+                <tr>
+                    <th scope="col">الاسم</th>
+                    <th scope="col">تاريخ الميلاد</th>
+                    <th scope="col">اسم الأب</th>
+                    <th scope="col">اسم الأم</th>
+                    <th scope="col">الصورة الشخصية</th>
+                    <th scope="col">صفحة الأب بدفتر العائلة</th>
+                    <th scope="col">صفحة الأم بدفتر العائلة</th>
+                    <th scope="col">الجنس</th>
+                    <th scope="col">حالة البيانات</th>
+                    <th scope="col">حالة بيانات أولياء الأمر</th>
+                    <th scope="col">إدارة بيانات الطالب</th>
+                    <th scope="col">إدارة بيانات أولياء الأمر</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var student in Model)
+                {
+                    <tr id="student_@student.Id" class="student_@student.ParentId">
+                        <td>@string.Join(" ", student.FirstName, student.LastName)</td>
+                        <td>@student.BirthDate.ToString("yyyy-MM-dd")</td>
+                        <td>@student.FatherFirstName</td>
+                        <td>@student.MotherFullName</td>
+                        <td><img style="height: 130px;" alt="@student.FirstName @student.LastName" src="@string.Concat("/images/students/", student.ImageName)" /></td>
+                        <td><img style="height: 130px;" alt="@student.FatherFirstName @student.LastName" src="@string.Concat("/images/parentsIdentity/", student.FatherIdentityImage)" /></td>
+                        <td><img style="height: 130px;" alt="@student.MotherFullName" src="@string.Concat("/images/parentsIdentity/", student.MotherIdentityImage)" /></td>
+                        @if (student.IsMale)
+                        {
+                            <td>ذكر</td>
+                        }
+                        else
+                        {
+                            <td>أنثى</td>
+                        }
+                        @if (student.IsValid)
+                        {
+                            <td>مؤكدة</td>
+                        }
+                        else
+                        {
+                            <td>
+                                غير مؤكدة
+                                <a href="#" class="validateProfile" data-id="@student.Id" style="text-decoration: none;"> تأكيد؟</a>
+                            </td>
+                        }
+                        @if (student.IsParentProfileValid)
+                        {
+                            <td>مؤكدة</td>
+                        }
+                        else
+                        {
+                            <td>
+                                غير مؤكدة
+                                <a href="#" class="validateParentProfile" data-id="@student.ParentId" style="text-decoration: none;"> تأكيد؟</a>
+                            </td>
+                        }
+                        <td>
+                            <a href="/registerstudent/studentInfo/edit/@student.Id" class="edit-btn" target="_blank"><i class="fas fa-edit"></i></a>
+                            <a href="#" data-id="@student.Id" class="remove-student-btn"><i class="fas fa-trash"></i></a>
+                        </td>
+                        <td>
+                            <a href="/registerstudent/parentsInfo/edit/@student.ParentId" class="edit-btn" target="_blank"><i class="fas fa-edit"></i></a>
+                            <a href="#" data-id="@student.ParentId" class="remove-parent-btn"><i class="fas fa-trash"></i></a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </section>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">حذف طالب</h5>
+                    <button type="button" class="btn-close clear-data" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="DeleteStudent" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <p>هل أنت متأكد من أنك تريد حذف الطالب?</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">نعم</button>
+                        <button type="button" class="btn btn-secondary clear-data" data-bs-dismiss="modal">لا</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@section scripts
+{
+    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            var infoTable = $('#info').DataTable({
+                "columnDefs": [
+                    { "type": "date-dd-MM-yyyy", targets: 1 }
+                ],
+                "language": {
+                    "url": "https://cdn.datatables.net/plug-ins/1.11.4/i18n/ar.json"
+                }
+            });
+
+            // sort date
+            (function () {
+
+                var customDateDDMMMYYYYToOrd = function (date) {
+                    "use strict"; //let's avoid tom-foolery in this function
+                    // Convert to a number YYYYMMDD which we can use to order
+                    var dateParts = date.split(/-/);
+                    return (dateParts[2] * 10000) +
+                        ($.inArray(dateParts[1].toUpperCase(),
+                            ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]) *
+                            100) +
+                        (dateParts[0] * 1);
+                };
+
+                // This will help DataTables magic detect the "dd-MMM-yyyy" format; Unshift
+                // so that it's the first data type (so it takes priority over existing)
+                jQuery.fn.dataTableExt.aTypes.unshift(
+                    function (sData) {
+                        "use strict"; //let's avoid tom-foolery in this function
+                        if (/^([0-2]?\d|3[0-1])-(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)-\d{4}/i.test(sData)) {
+                            return 'date-dd-mmm-yyyy';
+                        }
+                        return null;
+                    }
+                );
+
+                // define the sorts
+                jQuery.fn.dataTableExt.oSort['date-dd-mmm-yyyy-asc'] = function (a, b) {
+                    "use strict"; //let's avoid tom-foolery in this function
+                    var ordA = customDateDDMMMYYYYToOrd(a),
+                        ordB = customDateDDMMMYYYYToOrd(b);
+                    return (ordA < ordB) ? -1 : ((ordA > ordB) ? 1 : 0);
+                };
+
+                jQuery.fn.dataTableExt.oSort['date-dd-mmm-yyyy-desc'] = function (a, b) {
+                    "use strict"; //let's avoid tom-foolery in this function
+                    var ordA = customDateDDMMMYYYYToOrd(a),
+                        ordB = customDateDDMMMYYYYToOrd(b);
+                    return (ordA < ordB) ? 1 : ((ordA > ordB) ? -1 : 0);
+                };
+
+            })();
+            // end sort date
+            var studentId = null, parentId = null;
+
+            $("#info").on("click",
+                "a.remove-student-btn",
+                function (e) {
+                    e.preventDefault();
+                    $("#deleteModalLabel").text("حذف طالب");
+                    $("#DeleteStudent").find("p").eq(0).text("هل أنت متأكد من أنك تريد حذف الطالب؟");
+                    studentId = $(this).attr('data-id');
+                    $('#deleteModal').modal('toggle');
+                });
+
+            $("#info").on("click",
+                "a.remove-parent-btn",
+                function (e) {
+                    e.preventDefault();
+                    $("#deleteModalLabel").text("حذف ولي أمر");
+                    $("#DeleteStudent").find("p").eq(0).text("هل أنت متأكد من أنك تريد حذف ولي الأمر؟");
+                    parentId = $(this).attr('data-id');
+                    $('#deleteModal').modal('toggle');
+                });
+
+            $('#DeleteStudent').submit(function (e) {
+                e.preventDefault();
+                if (studentId != null) {
+                    $.ajax({
+                        async: false,
+                        url: '/api/student/deleteStudent/' + studentId,
+                        method: 'DELETE',
+                        statusCode: {
+                            404: function (response) {
+                                $('#deleteModal').modal('toggle');
+                                $("#notification").text("الطالب غير موجود.");
+                                $('.toast').toast('show');
+                                studentId = null;
+                            },
+                            500: function (response) {
+                                $('#deleteModal').modal('toggle');
+                                $("#notification").text("يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً");
+                                $('.toast').toast('show');
+                                studentId = null;
+                            },
+                            200: function () {
+                                infoTable.row("#student_" + studentId).remove().draw();
+                                $('#deleteModal').modal('toggle');
+                                $("#notification").text("تم حذف الطالب بنجاح.");
+                                $('.toast').toast('show');
+                                studentId = null;
+                            }
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        async: false,
+                        url: '/api/student/deleteParent/' + parentId,
+                        method: 'DELETE',
+                        statusCode: {
+                            404: function (response) {
+                                $('#deleteModal').modal('toggle');
+                                $("#notification").text("ولي الأمر غير موجود.");
+                                $('.toast').toast('show');
+                                parentId = null;
+                            },
+                            500: function (response) {
+                                $('#deleteModal').modal('toggle');
+                                $("#notification").text("يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً");
+                                $('.toast').toast('show');
+                                parentId = null;
+                            },
+                            200: function () {
+                                infoTable.row(".student_" + parentId).remove().draw();
+                                $('#deleteModal').modal('toggle');
+                                $("#notification").text("تم حذف ولي الأمر بنجاح.");
+                                $('.toast').toast('show');
+                                parentId = null;
+                            }
+                        }
+                    });
+                }
+            });
+
+
+            $("#info").on("click",
+                "a.validateProfile",
+                function (e) {
+                    e.preventDefault();
+                    studentId = $(this).attr('data-id');
+                    $.ajax({
+                        async: false,
+                        url: '/api/student/validateStudentProfile/' + studentId,
+                        method: 'put',
+                        statusCode: {
+                            404: function (response) {
+                                $("#notification").text("الطالب غير موجود.");
+                                $('.toast').toast('show');
+                                studentId = null;
+                            },
+                            500: function (response) {
+                                $("#notification").text("يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً");
+                                $('.toast').toast('show');
+                                studentId = null;
+                            },
+                            200: function () {
+                                $("#student_" + studentId).find("td").eq(8).text("مؤكدة");
+                                $("#notification").text("تم تأكيد بيانات الطالب بنجاح.");
+                                $('.toast').toast('show');
+                                studentId = null;
+                            }
+                        }
+                    });
+                });
+
+            $("#info").on("click",
+                "a.validateParentProfile",
+                function (e) {
+                    e.preventDefault();
+                    parentId = $(this).attr('data-id');
+                    $.ajax({
+                        async: false,
+                        url: '/api/student/validateParentProfile/' + parentId,
+                        method: 'put',
+                        statusCode: {
+                            404: function (response) {
+                                $("#notification").text("ولي الأمر غير موجود.");
+                                $('.toast').toast('show');
+                                parentId = null;
+                            },
+                            500: function (response) {
+                                $("#notification").text("يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً");
+                                $('.toast').toast('show');
+                                parentId = null;
+                            },
+                            200: function () {
+                                $(".student_" + parentId).find("td").eq(9).text("مؤكدة");
+                                $("#notification").text("تم تأكيد بيانات ولي الأمر بنجاح.");
+                                $('.toast').toast('show');
+                                parentId = null;
+                            }
+                        }
+                    });
+                });
+        });
+    </script>
+}

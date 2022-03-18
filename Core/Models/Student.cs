@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -24,5 +25,18 @@ namespace KiddieParadies.Core.Models
         public int ParentId { get; set; }
 
         public Parent Parent { get; set; }
+
+        public int Level { get; set; }
+
+        public int ClassRoom { get; set; }
+
+        public int TripId { get; set; }
+
+        public ICollection<YearStudent> YearStudents { get; set; }
+
+        public Student()
+        {
+            YearStudents = new List<YearStudent>();
+        }
     }
 }

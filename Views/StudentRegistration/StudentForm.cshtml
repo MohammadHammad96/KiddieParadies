@@ -42,15 +42,15 @@
             </div>
             <div class="col-md-6">
                 @Html.LabelFor(m => m.BirthDate, new { @class = "col-form-label" })
-                @Html.TextBoxFor(m => m.BirthDate,
+                @Html.TextBoxFor(m => m.BirthDate, "{0:yyyy-MM-dd}",
                     new
                     {
                         @class = "form-control",
-                             @type = "date"
+                        @type = "date"
                         ,
-                             @data_val_validLevelOneBirthDate = "",
-                             @data_val_validLevelTwoBirthDate = "",
-                             @data_val_validLevelThreeBirthDate = "",
+                        @data_val_validLevelOneBirthDate = "",
+                        @data_val_validLevelTwoBirthDate = "",
+                        @data_val_validLevelThreeBirthDate = "",
                     })
                 @Html.ValidationMessageFor(m => m.BirthDate)
             </div>
@@ -59,20 +59,7 @@
                 @foreach (var level in Model.AvailableLevels)
                 {
                     <div class="form-check">
-                        @{
-                            if (level.Key == 3)
-                            {
-                                <input class="form-check-input" type="radio" asp-for="Level" value="null">
-                            }
-                            else if (level.Key == 4)
-                            {
-                                <input class="form-check-input" type="radio" asp-for="Level" value="false">
-                            }
-                            else if (level.Key == 5)
-                            {
-                                <input class="form-check-input" type="radio" asp-for="Level" value="true">
-                            }
-                        }
+                        <input class="form-check-input" type="radio" asp-for="Level" value="@level.Key">
                         <label class="form-check-label" for="@Model.Level">
                             @level.Value
                         </label>
@@ -167,7 +154,7 @@
         $(function () {
             jQuery.validator.addMethod('validLevelOneBirthDate', function (value, element, params) {
                 var isValid = true;
-                if ($('#Level:checked').val() == "null")
+                if ($('#Level:checked').val() == 1)
                     if (new Date().getYear() - new Date(value).getYear() != 2)
                         isValid = false;
                 return isValid;
@@ -184,7 +171,7 @@
         $(function () {
             jQuery.validator.addMethod('validLevelTwoBirthDate', function (value, element, params) {
                 var isValid = true;
-                if ($('#Level:checked').val() == "false")
+                if ($('#Level:checked').val() == 2)
                     if (new Date().getYear() - new Date(value).getYear() != 3)
                         isValid = false;
                 return isValid;
@@ -201,7 +188,7 @@
         $(function () {
             jQuery.validator.addMethod('validLevelThreeBirthDate', function (value, element, params) {
                 var isValid = true;
-                if ($('#Level:checked').val() == "true")
+                if ($('#Level:checked').val() == 3)
                     if (new Date().getYear() - new Date(value).getYear() != 4)
                         isValid = false;
                 return isValid;

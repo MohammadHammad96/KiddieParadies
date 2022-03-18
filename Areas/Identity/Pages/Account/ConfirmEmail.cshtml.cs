@@ -15,11 +15,13 @@ namespace KiddieParadies.Areas.Identity.Pages.Account
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public ConfirmEmailModel(UserManager<ApplicationUser> userManager, IUnitOfWork unitOfWork)
+        public ConfirmEmailModel(UserManager<ApplicationUser> userManager, IUnitOfWork unitOfWork, SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _unitOfWork = unitOfWork;
+            _signInManager = signInManager;
         }
 
         [TempData]
@@ -47,6 +49,9 @@ namespace KiddieParadies.Areas.Identity.Pages.Account
             }
             StatusMessage = result.Succeeded ? "شكراً لتأكيد حسابك." : "يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً.";
             ViewData["StatusMessage"] = StatusMessage;
+
+            if (result.Succeeded)
+                await _signInManager.SignInAsync(user, true);
             return Page();
         }
     }

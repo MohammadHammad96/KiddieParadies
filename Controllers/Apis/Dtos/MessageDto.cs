@@ -5,7 +5,7 @@ namespace KiddieParadies.Controllers.Apis.Dtos
 {
     public class MessageDto
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public int SenderId { get; set; }
         public int ReceiverId { get; set; }
         [Required(AllowEmptyStrings = false)]

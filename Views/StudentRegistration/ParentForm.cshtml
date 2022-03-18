@@ -155,7 +155,7 @@
         // default location
         //var point = new Point(36.24607370074506, 33.49884737546621, 14);
         var point = new Point(parseFloat(@_configuration["Location:Longitude"]),
-            parseFloat(@_configuration["Location:Latitude"]), 14);
+            parseFloat(@_configuration["Location:Latitude"]), 16);
         // location from db
         if ($("#Longitude").val().length > 0)
             point = new Point(parseFloat($("#Longitude").val()), parseFloat($("#Latitude").val()), parseFloat($("#Zoom").val()));

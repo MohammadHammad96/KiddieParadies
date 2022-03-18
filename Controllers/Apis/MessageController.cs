@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -31,7 +32,7 @@ namespace KiddieParadies.Controllers.Apis
         private readonly IHubContext<NotificationUserHub> _notificationUserHubContext;
         private readonly IUserConnectionManager _userConnectionManager;
 
-        public MessageController(HttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager, IRepository<Employee> employeeRepository, IRepository<Parent> parentRepository, IRepository<Message> messageRepository, IMapper mapper, IUnitOfWork unitOfWork, IHubContext<NotificationUserHub> notificationUserHubContext, IUserConnectionManager userConnectionManager)
+        public MessageController(IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager, IRepository<Employee> employeeRepository, IRepository<Parent> parentRepository, IRepository<Message> messageRepository, IMapper mapper, IUnitOfWork unitOfWork, IHubContext<NotificationUserHub> notificationUserHubContext, IUserConnectionManager userConnectionManager)
         {
             _userManager = userManager;
             _employeeRepository = employeeRepository;
@@ -44,29 +45,61 @@ namespace KiddieParadies.Controllers.Apis
             _httpContext = httpContextAccessor.HttpContext;
         }
 
-        [HttpGet("getUsers")]
-        public async Task<IActionResult> GetUsers()
+        [HttpGet("getUsers/{name?}")]
+        public async Task<IActionResult> GetUsers(string name)
         {
             var userId = _httpContext.User.Claims.First(u => u.Type == ClaimTypes.NameIdentifier).Value;
 
-            var employees = await _employeeRepository.GetAsync(null, null, e => e.User);
-            var parents = await _parentRepository.GetAsync(null, null, e => e.User);
+            Expression<Func<Employee, bool>> employeeFilters = null;
+            Expression<Func<Parent, bool>> parentFilters = null;
 
-            var result = employees.Select(e => new IdNameDto
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                employeeFilters = e => (e.FirstName + " " + e.LastName).Contains(name);
+                parentFilters = p => (p.FatherName + " " + p.FatherLastName).Contains(name);
+            }
+
+            var employees = await _employeeRepository
+                .GetAsync(employeeFilters, null, e => e.User);
+            var parents = await _parentRepository
+                .GetAsync(parentFilters, null, p => p.User, p => p.Children);
+
+            var result = employees.Select(e => new UserChatDto
             {
                 Name = e.FirstName + " " + e.LastName,
-                Id = e.UserId
+                Id = e.UserId,
+                ImagePath = string.Concat("/images/employees/", e.ImageName)
             }).ToList();
 
-            result.AddRange(parents.Select(e => new IdNameDto
+            result.AddRange(parents.Select(p => new UserChatDto
             {
-                Name = e.FatherName + " " + e.FatherLastName,
-                Id = e.UserId
+                Name = p.FatherName + " " + p.FatherLastName,
+                Id = p.UserId,
+                ImagePath = string.Concat("/images/students/", p.Children.FirstOrDefault()?.ImageName)
             }));
 
-            result.Add(new IdNameDto { Id = 1, Name = "مدير الروضة" });
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                if (new string("مدير الروضة").Contains(name))
+                    result.Add(new UserChatDto
+                    {
+                        Id = 1,
+                        Name = "مدير الروضة",
+                        ImagePath = "/Logo.png"
+                    });
+            }
+            else
+            {
+                result.Add(new UserChatDto
+                {
+                    Id = 1,
+                    Name = "مدير الروضة",
+                    ImagePath = "/Logo.png"
+                });
+            }
 
-            result.Remove(result.First(u => u.Id.ToString() == userId));
+            if (result.Any(u => u.Id.ToString() == userId))
+                result.Remove(result.First(u => u.Id.ToString() == userId));
 
             return Ok(result);
         }
@@ -82,7 +115,8 @@ namespace KiddieParadies.Controllers.Apis
                 .GetAsync(m => usersId.Contains(m.SenderId) && usersId.Contains(m.ReceiverId),
                     m => m.OrderByDescending(chat => chat.Time));
 
-            return Ok(chat);
+            var dto = _mapper.Map<IEnumerable<MessageDto>>(chat);
+            return Ok(dto);
         }
 
         [HttpPost("send")]
@@ -117,7 +151,7 @@ namespace KiddieParadies.Controllers.Apis
                     try
                     {
                         await _notificationUserHubContext.Clients.Client(connectionId)
-                            .SendAsync("sendToUser", messageDto);
+                            .SendAsync("sendMessage", messageDto);
 
                     }
                     catch (Exception)
@@ -133,6 +167,35 @@ namespace KiddieParadies.Controllers.Apis
                 return Ok(messageDto);
             }
 
+        }
+
+        [HttpGet("getuserInfo/{id}")]
+        public async Task<IActionResult> GetUserInfo(int id)
+        {
+            if (id == 1)
+                return Ok(new
+                {
+                    Name = "مدير الروضة",
+                    ImagePath = "/Logo.png"
+                });
+
+            var employee = (await _employeeRepository.GetAsync(e => e.UserId == id))
+                .FirstOrDefault();
+            if (employee != null)
+                return Ok(new
+                {
+                    Name = string.Join(" ", employee.FirstName, employee.LastName),
+                    ImagePath = string.Concat("/images/employees/", employee.ImageName)
+                });
+
+            var parent = (await _parentRepository
+                    .GetAsync(p => p.UserId == id, null, p => p.Children))
+                .FirstOrDefault();
+            return Ok(new
+            {
+                Name = parent.FatherName + " " + parent.FatherLastName,
+                ImagePath = parent.Children.FirstOrDefault()?.ImageName
+            });
         }
 
         /*[HttpPost("SendToAllUsers")]

@@ -299,7 +299,7 @@ namespace KiddieParadies.Controllers
             if (await _unitOfWork.SaveChangesAsync() > 0)
             {
                 await _signInManager.SignInAsync(user, true);
-                return RedirectToAction("NewParentsProfile");
+                return RedirectToAction("NewStudentProfile");
             }
 
             _imagesRepository.Delete(parent.FatherIdentityImageName, ParentsImagesFolderName);
@@ -334,30 +334,30 @@ namespace KiddieParadies.Controllers
                 switch (availableLevels)
                 {
                     case 3:
-                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "√Ê· (À·«À ”‰Ê« )"));
+                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(1, "√Ê· (À·«À ”‰Ê« )"));
                         break;
                     case 4:
-                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(4, "À«‰Ì (√—»⁄ ”‰Ê« )"));
+                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(2, "À«‰Ì (√—»⁄ ”‰Ê« )"));
                         break;
                     case 5:
-                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(5, "À«·À (Œ„” ”‰Ê« )"));
+                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "À«·À (Œ„” ”‰Ê« )"));
                         break;
                     case 7:
-                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "√Ê· (À·«À ”‰Ê« )"));
-                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(4, "À«‰Ì (√—»⁄ ”‰Ê« )"));
+                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(1, "√Ê· (À·«À ”‰Ê« )"));
+                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(2, "À«‰Ì (√—»⁄ ”‰Ê« )"));
                         break;
                     case 8:
-                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "√Ê· (À·«À ”‰Ê« )"));
-                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(5, "À«·À (Œ„” ”‰Ê« )"));
+                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(1, "√Ê· (À·«À ”‰Ê« )"));
+                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "À«·À (Œ„” ”‰Ê« )"));
                         break;
                     case 9:
-                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(4, "À«‰Ì (√—»⁄ ”‰Ê« )"));
-                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(5, "À«·À (Œ„” ”‰Ê« )"));
+                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(2, "À«‰Ì (√—»⁄ ”‰Ê« )"));
+                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "À«·À (Œ„” ”‰Ê« )"));
                         break;
                     case 12:
-                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "√Ê· (À·«À ”‰Ê« )"));
-                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(4, "À«‰Ì (√—»⁄ ”‰Ê« )"));
-                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(5, "À«·À (Œ„” ”‰Ê« )"));
+                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(1, "√Ê· (À·«À ”‰Ê« )"));
+                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(2, "À«‰Ì (√—»⁄ ”‰Ê« )"));
+                        viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "À«·À (Œ„” ”‰Ê« )"));
                         break;
                 }
 
@@ -372,9 +372,9 @@ namespace KiddieParadies.Controllers
                 return View("NotFound");
 
             viewModel.ParentId = parent.Id;
-            viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "√Ê· (À·«À ”‰Ê« )"));
-            viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(4, "À«‰Ì (√—»⁄ ”‰Ê« )"));
-            viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(5, "À«·À (Œ„” ”‰Ê« )"));
+            viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(1, "√Ê· (À·«À ”‰Ê« )"));
+            viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(2, "À«‰Ì (√—»⁄ ”‰Ê« )"));
+            viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "À«·À (Œ„” ”‰Ê« )"));
             return View("StudentForm", viewModel);
         }
 
@@ -392,9 +392,9 @@ namespace KiddieParadies.Controllers
             {
                 viewModel = _mapper.Map<StudentFormViewModel>(student);
 
-                viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "√Ê· (À·«À ”‰Ê« )"));
-                viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(4, "À«‰Ì (√—»⁄ ”‰Ê« )"));
-                viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(5, "À«·À (Œ„” ”‰Ê« )"));
+                viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(1, "√Ê· (À·«À ”‰Ê« )"));
+                viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(2, "À«‰Ì (√—»⁄ ”‰Ê« )"));
+                viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "À«·À (Œ„” ”‰Ê« )"));
 
                 return View("StudentForm", viewModel);
             }
@@ -421,30 +421,30 @@ namespace KiddieParadies.Controllers
             switch (availableLevels)
             {
                 case 3:
-                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "√Ê· (À·«À ”‰Ê« )"));
+                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(1, "√Ê· (À·«À ”‰Ê« )"));
                     break;
                 case 4:
-                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(4, "À«‰Ì (√—»⁄ ”‰Ê« )"));
+                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(2, "À«‰Ì (√—»⁄ ”‰Ê« )"));
                     break;
                 case 5:
-                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(5, "À«·À (Œ„” ”‰Ê« )"));
+                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "À«·À (Œ„” ”‰Ê« )"));
                     break;
                 case 7:
-                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "√Ê· (À·«À ”‰Ê« )"));
-                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(4, "À«‰Ì (√—»⁄ ”‰Ê« )"));
+                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(1, "√Ê· (À·«À ”‰Ê« )"));
+                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(2, "À«‰Ì (√—»⁄ ”‰Ê« )"));
                     break;
                 case 8:
-                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "√Ê· (À·«À ”‰Ê« )"));
-                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(5, "À«·À (Œ„” ”‰Ê« )"));
+                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(1, "√Ê· (À·«À ”‰Ê« )"));
+                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "À«·À (Œ„” ”‰Ê« )"));
                     break;
                 case 9:
-                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(4, "À«‰Ì (√—»⁄ ”‰Ê« )"));
-                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(5, "À«·À (Œ„” ”‰Ê« )"));
+                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(2, "À«‰Ì (√—»⁄ ”‰Ê« )"));
+                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "À«·À (Œ„” ”‰Ê« )"));
                     break;
                 case 12:
-                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "√Ê· (À·«À ”‰Ê« )"));
-                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(4, "À«‰Ì (√—»⁄ ”‰Ê« )"));
-                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(5, "À«·À (Œ„” ”‰Ê« )"));
+                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(1, "√Ê· (À·«À ”‰Ê« )"));
+                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(2, "À«‰Ì (√—»⁄ ”‰Ê« )"));
+                    viewModel.AvailableLevels.Add(new KeyValuePair<int, string>(3, "À«·À (Œ„” ”‰Ê« )"));
                     break;
             }
 
@@ -553,8 +553,9 @@ namespace KiddieParadies.Controllers
 
                 student.ImageName = await _imagesRepository
                     .Save(viewModel.Image, StudentsImagesFolderName);
+                student.YearStudents.Add(new YearStudent { YearId = year.Id });
                 await _studentRepository.AddAsync(student);
-                await _yearStudentRepository.AddAsync(new YearStudent { StudentId = student.Id, YearId = year.Id });
+                //await _yearStudentRepository.AddAsync(new YearStudent { StudentId = student.Id, YearId = year.Id });
                 if (await _unitOfWork.SaveChangesAsync() > 0)
                     return RedirectToAction("NewParentsProfile");
 
@@ -586,6 +587,32 @@ namespace KiddieParadies.Controllers
             _imagesRepository.Delete(studentToUpdate.ImageName, StudentsImagesFolderName);
             ModelState.AddModelError("FirstName", "ÌÊÃœ Œÿ√ »«·„Œœ„° Ì—ÃÏ «·„Õ«Ê·… ·«Õﬁ«");
             return View("StudentForm", viewModel);
+        }
+
+        [HttpGet("listStudents")]
+        public async Task<IActionResult> ListStudents()
+        {
+            var students = await _studentRepository
+                .GetAsync(null, null, s => s.Parent);
+
+            var result = students.Select(s => new StudentListViewModel
+            {
+                Id = s.Id,
+                ParentId = s.ParentId,
+                FirstName = s.FirstName,
+                LastName = s.Parent.FatherLastName,
+                FatherFirstName = s.Parent.FatherName,
+                MotherFullName = s.Parent.MotherFullName,
+                BirthDate = s.BirthDate,
+                ImageName = s.ImageName,
+                IsMale = s.IsMale,
+                IsValid = s.IsValid,
+                IsParentProfileValid = s.Parent.IsValid,
+                FatherIdentityImage = s.Parent.FatherIdentityImageName,
+                MotherIdentityImage = s.Parent.MotherIdentityImageName
+            }).ToList();
+
+            return View(result);
         }
 
         private async Task<int> RegistrationAvailable(int yearId)

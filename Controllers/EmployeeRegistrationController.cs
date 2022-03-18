@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper.Internal;
 
 namespace KiddieParadies.Controllers
 {
@@ -18,13 +19,12 @@ namespace KiddieParadies.Controllers
     public class EmployeeRegistrationController : Controller
     {
         private readonly IRepository<EmployeeRegistrationInfo> _employeeRegistrationInfoRepository;
-        //private readonly IEmployeeRepository _employeeRepository;
         private readonly IRepository<Employee> _employeeRepository;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ApplicationUser _loggedUser;
         private readonly IList<string> _userRoles;
         private readonly IRepository<Year> _yearRepository;
-        //private readonly IRepository<YearEmployee> _yearEmployeeRepository;
+        private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IImagesRepository _imagesRepository;
@@ -39,7 +39,7 @@ namespace KiddieParadies.Controllers
             IRepository<Year> yearRepository,// IRepository<YearEmployee> yearEmployeeRepository,
              IMapper mapper, IUnitOfWork unitOfWork, IImagesRepository imagesRepository,
             SignInManager<ApplicationUser> signInManager, IRepository<Employee> employeeRepository,
-            IFilesRepository filesRepository)
+            IFilesRepository filesRepository, RoleManager<ApplicationRole> roleManager)
         {
             _userManager = userManager;
             _yearRepository = yearRepository;
@@ -49,6 +49,7 @@ namespace KiddieParadies.Controllers
             _signInManager = signInManager;
             _employeeRepository = employeeRepository;
             _filesRepository = filesRepository;
+            _roleManager = roleManager;
             _employeeRegistrationInfoRepository = employeeRegistrationRepository;
             //_yearEmployeeRepository = yearEmployeeRepository;
             _loggedUser = _userManager.FindByNameAsync(httpContextAccessor.HttpContext.User.Identity.Name).Result;
@@ -313,6 +314,41 @@ namespace KiddieParadies.Controllers
 
             ModelState.AddModelError("FirstName", "يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً");
             return View("EmployeeForm", viewModel);
+        }
+
+        [HttpGet("list")]
+        public async Task<IActionResult> List()
+        {
+            var roles = _roleManager.Roles.ToList();
+            var employees = await _employeeRepository
+                .GetAsync(null, null, e => e.User.UserRoles);
+
+            foreach (var employee in employees)
+            {
+                var employeeRoleId = employee.User.UserRoles.First().RoleId;
+                if (roles.Any(r => r.Id == employeeRoleId))
+                {
+                    var roleName = roles.First(r => r.Id == employeeRoleId).Name;
+                    if (roleName == "Teacher")
+                        roleName = "معلم";
+                    else if (roleName == "Driver")
+                        roleName = "سائق";
+                    else if (roleName == "Escort")
+                        roleName = "مرافق سائق";
+
+                    employee.User.UserRoles = new List<ApplicationUserRole>
+                        {
+                            new ApplicationUserRole
+                            {
+                                Role = new ApplicationRole
+                                {
+                                    Name = roleName
+                                }
+                            }
+                        };
+                }
+            }
+            return View(employees);
         }
 
         private async Task GetAvailableRoles(int yearId, Dictionary<string, string> roles)

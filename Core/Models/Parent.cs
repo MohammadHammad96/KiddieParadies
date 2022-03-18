@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace KiddieParadies.Core.Models
@@ -27,5 +28,12 @@ namespace KiddieParadies.Core.Models
 
         [Required]
         public Location HomeLocation { get; set; }
+
+        public ICollection<Student> Children { get; set; }
+
+        public Parent()
+        {
+            Children = new List<Student>();
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace KiddieParadies.Core.Models
+﻿using System.Collections.Generic;
+
+namespace KiddieParadies.Core.Models
 {
     public class LevelCourse : Entity
     {
@@ -13,5 +15,12 @@
         public int CourseId { get; set; }
 
         public Course Course { get; set; }
+
+        public ICollection<CourseClassRoom> CourseClassRooms { get; set; }
+
+        public LevelCourse()
+        {
+            CourseClassRooms = new List<CourseClassRoom>();
+        }
     }
 }

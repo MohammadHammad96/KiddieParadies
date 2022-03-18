@@ -188,10 +188,8 @@
     </style>
 }
 <section>
-    <button class="btn btn-primary" id="new" data-bs-toggle="modal" data-bs-target="#manageModal">
-        شعبة
-        جديدة
-    </button>
+    <button class="btn btn-primary" id="new" data-bs-toggle="modal" data-bs-target="#manageModal">شعبة جديدة</button>
+    <button class="btn btn-secondary" id="randomEnroll">توزيع الطلاب على الشعب</button>
 </section>
 <section class="table-responsive">
     <table id="info" class="table align-middle display">
@@ -310,13 +308,13 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">حذف موعد</h5>
+                <h5 class="modal-title" id="deleteModalLabel">حذف شعبة</h5>
                 <button type="button" class="btn-close clear-data" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="DeleteStudentRegistrationInfo" method="POST">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <p>هل أنت متأكد من أنك تريد حذف الموعد?</p>
+                        <p>هل أنت متأكد من أنك تريد حذف الشعبة؟</p>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -440,6 +438,27 @@
                     500: function () {
                     }
                 }
+            });
+
+            $("#randomEnroll").click(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    async: false,
+                    url: '/api/weekProgram/enrollStudentsRandomly',
+                    method: 'GET',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    statusCode: {
+                        200: function () {
+                            $("#notification").text("تم توزيع الطلاب على الشعب بنجاح.");
+                            $('.toast').toast('show');
+                        },
+                        500: function () {
+                            $("#notification").text("لم تطرأ تعديلات على الشعب بعد، لذلك لم يتم توزيع الطلاب مجدداً.");
+                            $('.toast').toast('show');
+                        }
+                    }
+                });
             });
 
             $("#addBtn").attr("disabled", "disabled");

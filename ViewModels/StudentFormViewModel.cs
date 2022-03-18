@@ -36,7 +36,7 @@ namespace KiddieParadies.ViewModels
 
         [DisplayName("المستوى")]
         [Required(ErrorMessage = "هذا الحقل إجباري")]
-        public bool? Level { get; set; }
+        public int Level { get; set; }
 
         public StudentFormViewModel()
         {

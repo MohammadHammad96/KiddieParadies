@@ -1,7 +1,11 @@
 @using System.Globalization
+@using System.Security.Claims
+@using KiddieParadies.Core.Models
+@using Microsoft.AspNetCore.Identity
 @model IEnumerable<KiddieParadies.Core.Models.Blog>
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration _configuration
+@inject SignInManager<ApplicationUser> _signInManager
 @{
     ViewData["Title"] = "الأخبار";
 }
@@ -29,10 +33,13 @@
                 <div class="row">
                     <span class="col-md-12">@blog.ShortContent</span>
                 </div>
-                <div class="row">
-                    @Html.ActionLink("تعديل", "Edit", "Blogs", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-1 offset-md-10 col-sm-2 offset-sm-8" })
-                    @Html.ActionLink("حذف", "Delete", "Blogs", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-1 col-sm-2" })
-                </div>
+                @if (_signInManager.IsSignedIn(User) && User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin"))
+                {
+                    <div class="row">
+                        @Html.ActionLink("تعديل", "Edit", "Blogs", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-1 offset-md-10 col-sm-2 offset-sm-8" })
+                        @Html.ActionLink("حذف", "Delete", "Blogs", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-1 col-sm-2" })
+                    </div>
+                }
             </div>
         </div>
         <div class="col-md-2">

@@ -75,6 +75,8 @@ namespace KiddieParadies
             services.AddScoped<IRepository<LevelCourse>, Repository<LevelCourse>>();
             services.AddScoped<IRepository<CourseClassRoom>, Repository<CourseClassRoom>>();
             services.AddScoped<IRepository<Message>, Repository<Message>>();
+            services.AddScoped<IRepository<Notification>, Repository<Notification>>();
+            services.AddScoped<IApplicationRepository<ApplicationUserRole>, ApplicationRepository<ApplicationUserRole>>();
 
             services.AddAutoMapper(typeof(Startup));
 

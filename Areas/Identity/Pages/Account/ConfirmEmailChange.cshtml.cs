@@ -63,7 +63,7 @@ namespace KiddieParadies.Areas.Identity.Pages.Account
                 ModelState.AddModelError(string.Empty, "íæÌÏ ÎØÃ ÈÇáãÎÏã¡ íÑÌì ÇáãÍÇæáÉ áÇÍŞÇğ");
                 return Page();
             }
-            StatusMessage = "Thank you for confirming your email change.";
+            StatusMessage = "Êã ÊÃßíÏ ÈÑíÏß ÇáÇáßÊÑæäí ÇáÌÏíÏ ÈäÌÇÍ.";
             return Page();
         }
     }

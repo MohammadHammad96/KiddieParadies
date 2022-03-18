@@ -4,14 +4,16 @@ using KiddieParadies.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KiddieParadies.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220318153101_AddLevelAndClassToStudentsTable")]
+    partial class AddLevelAndClassToStudentsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -572,7 +574,7 @@ namespace KiddieParadies.Data.Migrations
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("Date");
 
-                    b.Property<int>("ClassRoom")
+                    b.Property<int?>("ClassRoom")
                         .HasColumnType("int");
 
                     b.Property<string>("FirstName")
@@ -590,13 +592,13 @@ namespace KiddieParadies.Data.Migrations
                     b.Property<bool>("IsValid")
                         .HasColumnType("bit");
 
-                    b.Property<int>("Level")
+                    b.Property<int?>("Level")
                         .HasColumnType("int");
 
                     b.Property<int>("ParentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TripId")
+                    b.Property<int?>("TripId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

@@ -1,0 +1,68 @@
+﻿@model KiddieParadies.Core.Models.Trip
+@{
+    ViewData["title"] = "تفقد الطلاب";
+}
+
+<h2>تفقد الطلاب</h2>
+<div class="row">
+    @foreach (var student in Model.Students)
+    {
+        <div class="form-check col-lg-2 col-md-3 col-sm-6 col-xs-12 mb-3">
+            <input class="form-check-input" type="checkbox" name="@string.Join("", student.FirstName, student.Parent.FatherLastName)" value="@student.Id" id="student_@student.Id" data-tripid="@Model.Id">
+            <label class="form-check-label" for="@string.Join("", student.FirstName, student.Parent.FatherLastName)">
+                @string.Join(" ", student.FirstName, student.Parent.FatherLastName)
+            </label>
+        </div>
+    }
+</div>
+
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            $("input[type='checkbox']").change(function (e) {
+                var element = $(this);
+                $.ajax({
+                    async: false,
+                    url: "/api/trip/takeAttendance",
+                    method: 'POST',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data: JSON.stringify({
+                        StudentId: $(element).val(),
+                        TripId: $(element).attr("data-tripid")
+                    }),
+                    statusCode: {
+                        200: function () {
+                            if ($("input[type='checkbox']").length == 1) {
+                                $("#notification").text("تم تفقد جميع طلاب الرحلة بنجاح، سيتم توجيهك إلى الصفحة الرئيسية.");
+                                $('.toast').toast('show');
+                                $(element).parent().remove();
+
+                                setTimeout(function () {
+                                    window.location.href = '/';
+                                }, 10000);
+                            } else {
+                                $("#notification").text("تم تفقد الطالب " + $(element).next().text().trim() + " بنجاح.");
+                                $('.toast').toast('show');
+                                $(element).parent().remove();
+
+                                setTimeout(function () {
+                                    window.location.href = '/';
+                                }, 10000);
+                            }
+                        },
+                        404: function () {
+                            $("#notification").text("هذا الطالب غير موجود.");
+                            $('.toast').toast('show');
+                        },
+                        500: function () {
+                            $("#notification").text("يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً.");
+                            $('.toast').toast('show');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

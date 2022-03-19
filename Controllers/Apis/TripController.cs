@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using KiddieParadies.Core.Models;
 using KiddieParadies.Core.Services;
 using KiddieParadies.Extensions;
@@ -17,13 +18,15 @@ namespace KiddieParadies.Controllers.Apis
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Student> _studentRepository;
         private readonly IMapper _mapper;
+        private readonly IRepository<Attendance> _attendanceRepository;
 
-        public TripController(IRepository<Trip> tripRepository, IUnitOfWork unitOfWork, IRepository<Student> studentRepository, IMapper mapper)
+        public TripController(IRepository<Trip> tripRepository, IUnitOfWork unitOfWork, IRepository<Student> studentRepository, IMapper mapper, IRepository<Attendance> attendanceRepository)
         {
             _tripRepository = tripRepository;
             _unitOfWork = unitOfWork;
             _studentRepository = studentRepository;
             _mapper = mapper;
+            _attendanceRepository = attendanceRepository;
         }
 
         [HttpPost("add")]
@@ -115,7 +118,7 @@ namespace KiddieParadies.Controllers.Apis
                 return Ok(dto);
             }
 
-            dto = new List<TrackViewModel>()
+            /*dto = new List<TrackViewModel>()
             {
                 new TrackViewModel
                 {
@@ -168,7 +171,7 @@ namespace KiddieParadies.Controllers.Apis
                         Title = "أحمد حمود"
                     }
                 }
-            };
+            };*/
             return Ok(dto);
         }
 
@@ -221,6 +224,31 @@ namespace KiddieParadies.Controllers.Apis
 
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
+
+        [HttpPost("takeAttendance")]
+        public async Task<IActionResult> TakeAttendance([FromBody] TakeAttendanceDto dto)
+        {
+            var trip = await _tripRepository.GetByIdAsync(dto.TripId);
+            if (trip == null)
+                return NotFound();
+
+            var student = await _studentRepository.GetByIdAsync(dto.StudentId);
+            if (student == null)
+                return NotFound();
+
+            var attendance = new Attendance
+            {
+                IsAttend = true,
+                StudentId = student.Id,
+                TripId = trip.Id,
+                Time = DateTime.Now
+            };
+            await _attendanceRepository.AddAsync(attendance);
+            if (await _unitOfWork.SaveChangesAsync() > 0)
+                return Ok();
+
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
     }
 
     public class GetTripStudentDto
@@ -242,5 +270,12 @@ namespace KiddieParadies.Controllers.Apis
         {
             TripStudents = new List<GetTripStudentDto>();
         }
+    }
+
+    public class TakeAttendanceDto
+    {
+        public int StudentId { get; set; }
+
+        public int TripId { get; set; }
     }
 }

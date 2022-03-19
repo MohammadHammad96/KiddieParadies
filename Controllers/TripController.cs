@@ -15,11 +15,13 @@ namespace KiddieParadies.Controllers
         private readonly IRepository<Trip> _tripRepository;
         private readonly IRepository<YearEmployee> _yearEmployeeRepository;
         private readonly HttpContext _httpContext;
+        private readonly IRepository<Student> _studentRepository;
 
-        public TripController(IRepository<Trip> tripRepository, IRepository<YearEmployee> employeeRepository, IHttpContextAccessor httpContextAccessor)
+        public TripController(IRepository<Trip> tripRepository, IRepository<YearEmployee> employeeRepository, IHttpContextAccessor httpContextAccessor, IRepository<Student> studentRepository)
         {
             _tripRepository = tripRepository;
             _yearEmployeeRepository = employeeRepository;
+            _studentRepository = studentRepository;
             _httpContext = httpContextAccessor.HttpContext;
         }
 
@@ -49,7 +51,7 @@ namespace KiddieParadies.Controllers
 
         public async Task<IActionResult> Track()
         {
-            var userId = HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value.ToInt();
+            var userId = _httpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value.ToInt();
             var trips = await _tripRepository.GetAsync(t => t.Driver.Employee.UserId == userId
             && t.Students.Any());
             return View(trips);
@@ -61,6 +63,20 @@ namespace KiddieParadies.Controllers
             var trips = await _tripRepository.GetAsync(/*t => t.Id != ignoredId.ToInt()*/null,
                 null, t => t.Driver.Employee, t => t.Escort.Employee);
             return View("TripStudents", trips);
+        }
+
+        public async Task<IActionResult> Attendance()
+        {
+            var userId = _httpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value.ToInt();
+            var trip = (await _tripRepository.GetAsync(t => t.Escort.Employee.UserId == userId
+            && t.IsActive == true, null, t => t.Students)).FirstOrDefault();
+            if (trip == null)
+                return View("Error", new ErrorViewModel("لا توجد رحلة حالياً"));
+
+            var students = await _studentRepository.GetAsync(s => s.TripId == trip.Id,
+                null, s => s.Parent);
+            trip.Students = students.ToList();
+            return View(trip);
         }
     }
 

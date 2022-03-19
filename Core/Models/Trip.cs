@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace KiddieParadies.Core.Models
@@ -12,6 +13,9 @@ namespace KiddieParadies.Core.Models
         public DateTime Time { get; set; }
 
         public bool Type { get; set; }
+
+        [DefaultValue(false)]
+        public bool IsActive { get; set; }
 
         public int DriverId { get; set; }
 

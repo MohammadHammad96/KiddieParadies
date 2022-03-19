@@ -31,13 +31,14 @@ namespace KiddieParadies.Controllers
         private const string ParentsImagesFolderName = "parentsIdentity";
         private const string StudentsImagesFolderName = "students";
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IRepository<Trip> _tripRepository;
 
         public StudentRegistrationController(IRepository<StudentRegistrationInfo> studentRegistrationInfoRepository,
             UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor,
             IRepository<Year> yearRepository, IRepository<YearStudent> yearStudentRepository,
             IRepository<Parent> parentRepository, IMapper mapper, IUnitOfWork unitOfWork,
             IRepository<Student> studentRepository, IImagesRepository imagesRepository,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager, IRepository<Trip> tripRepository)
         {
             _studentRegistrationInfoRepository = studentRegistrationInfoRepository;
             _userManager = userManager;
@@ -49,6 +50,7 @@ namespace KiddieParadies.Controllers
             _studentRepository = studentRepository;
             _imagesRepository = imagesRepository;
             _signInManager = signInManager;
+            _tripRepository = tripRepository;
             _loggedUser = _userManager.FindByNameAsync(httpContextAccessor.HttpContext.User.Identity.Name).Result;
             _userRoles = _userManager.GetRolesAsync(_loggedUser).Result;
         }
@@ -497,7 +499,7 @@ namespace KiddieParadies.Controllers
                     student.ImageName = await _imagesRepository
                         .Save(viewModel.Image, StudentsImagesFolderName);
                     student.IsValid = true;
-
+                    student.TripId = (await _tripRepository.GetAsync()).First().Id;
                     await _studentRepository.AddAsync(student);
                     await _yearStudentRepository.AddAsync(new YearStudent { StudentId = student.Id, YearId = year.Id });
                     if (await _unitOfWork.SaveChangesAsync() > 0)
@@ -555,6 +557,7 @@ namespace KiddieParadies.Controllers
                     .Save(viewModel.Image, StudentsImagesFolderName);
                 student.YearStudents.Add(new YearStudent { YearId = year.Id });
                 await _studentRepository.AddAsync(student);
+                student.TripId = (await _tripRepository.GetAsync()).First().Id;
                 //await _yearStudentRepository.AddAsync(new YearStudent { StudentId = student.Id, YearId = year.Id });
                 if (await _unitOfWork.SaveChangesAsync() > 0)
                     return RedirectToAction("NewParentsProfile");

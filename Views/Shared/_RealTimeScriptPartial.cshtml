@@ -88,7 +88,7 @@
                         return a.messageId - b.messageId;
                     });
                     indexChatPair.reverse();
-                    console.log(indexChatPair);
+                    //console.log(indexChatPair);
                     $("#messages hr, .chatSummary").remove();
                     $("#messages").append("<hr/>");
                     for (let result of indexChatPair) {
@@ -373,7 +373,7 @@
             limit: 500,
             source: users
         }).on("typeahead:select", function (e, user) {
-            console.log(user);
+            //console.log(user);
 
             var userName, userImage;
             //console.log(receiverId);

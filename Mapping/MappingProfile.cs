@@ -22,6 +22,14 @@ namespace KiddieParadies.Mapping
                     ed.YearName = e.Year.Name;
                 });
             CreateMap<Message, MessageDto>();
+            CreateMap<Student, GetTripStudentDto>()
+                .BeforeMap(((student, dto) =>
+                {
+                    dto.FirstName = student.FirstName;
+                    dto.LastName = student.Parent.FatherLastName;
+                    dto.StudentId = student.Id;
+                    dto.TripId = student.TripId;
+                }));
 
 
             CreateMap<YearDto, Year>();
@@ -44,7 +52,8 @@ namespace KiddieParadies.Mapping
                     p.HomeLocation.Zoom = vm.Zoom;
                 });
             CreateMap<StudentFormViewModel, Student>()
-                .ForMember(s => s.ImageName, opt => opt.Ignore());
+                .ForMember(s => s.ImageName, opt => opt.Ignore())
+                .ForMember(s => s.TripId, opt => opt.Ignore());
             CreateMap<EmployeeFormViewModel, Employee>()
                 .ForMember(e => e.ImageName, opt => opt.Ignore())
                 .ForMember(e => e.ResumeName, opt => opt.Ignore());

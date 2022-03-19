@@ -1,0 +1,157 @@
+﻿@using System.Globalization
+@model IEnumerable<KiddieParadies.Core.Models.Trip>
+@{
+    ViewData["title"] = "إدارة طلاب الرحلات";
+}
+
+@if (Model.Any())
+{
+
+    <h4 style="color: #03E; margin-bottom: 15px;">إدارة طلاب الرحلات</h4>
+
+    @using (Html.BeginForm("Index", "LevelCourse", FormMethod.Post, new { @id = "tripStudentsForm" }))
+    {
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="col-form-label">الرحلة</label>
+                <select class="form-select" id="tripSelect">
+                    @foreach (var trip in Model)
+                    {
+
+                        <option value="@trip.Id">@trip.Time.ToString("hh:mm tt", new CultureInfo("ar"))</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="row" id="studentsContainer">
+        </div>
+        <input type="submit" class="btn btn-primary" value="حفظ" />
+    }
+
+    @section Scripts
+    {
+        <script>
+            class Student {
+                constructor(studentId, tripId, firstName, lastName) {
+                    this.StudentId = studentId;
+                    this.TripId = tripId;
+                    this.FirstName = firstName;
+                    this.LastName = lastName;
+                }
+            }
+
+            var tripStudents = [];
+
+            $(document).ready(function (e) {
+
+                $('#tripSelect option').eq(0).text("...");
+                $('#tripSelect option').eq(1).prop('selected', true);
+
+                $.ajax({
+                    async: false,
+                    url: `/api/trip/getTripStudents/${$("#tripSelect option:selected").val()}`,
+                    method: 'GET',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    statusCode: {
+                        200: function (students) {
+                            if (students.length > 0)
+                                for (let tripStudent of students) {
+                                    if (tripStudent.tripId == $("#tripSelect option:selected").val()) {
+                                        $("#studentsContainer").append(
+                                            '<div class="form-check col-lg-2 col-md-3 col-sm-12 mb-3">' + '<input class="form-check-input" type="checkbox" checked="checked" value="' + tripStudent.studentId + '" data-tripid="' + tripStudent.tripId + '" data-firstname="' + tripStudent.firstName + '" data-lastname="' + tripStudent.lastName + '" name="student" id="student_' + tripStudent.studentId + '">' + '<label class="form-check-label" for="">' + tripStudent.firstName + ' ' + tripStudent.lastName + '</label></div>');
+                                    } else {
+                                        $("#studentsContainer").append(
+                                            '<div class="form-check col-lg-2 col-md-3 col-sm-12 mb-3">' + '<input class="form-check-input" type="checkbox" value="' + tripStudent.studentId + '" data-tripid="' + tripStudent.tripId + '" data-firstname="' + tripStudent.firstName + '" data-lastname="' + tripStudent.lastName + '" name="student" id="student_' + tripStudent.studentId + '">' + '<label class="form-check-label" for="">' + tripStudent.firstName + ' ' + tripStudent.lastName + '</label></div>');
+                                    }
+                                    //$("#" + tripStudent.courseId + tripStudent.levelId).attr("checked", "checked");
+                                    if (tripStudent.tripId == $('#tripSelect option:selected').val())
+                                        tripStudents.push(new Student(tripStudent.studentId, tripStudent.tripId, tripStudent.firstName, tripStudent.lastName));
+                                }
+                        }
+                    }
+                });
+
+                console.log(tripStudents);
+
+                $("#tripStudentsForm").on("change",
+                    "input[type='checkbox']",
+                    function (e) {
+                        if ($(this).prop('checked'))
+                            tripStudents.push(new Student(parseInt(this.value), parseInt($('#tripSelect option:selected').val()), $(this).attr("data-firstname"), $(this).attr("data-lastname")));
+                        else
+                            for (let i = 0; i < tripStudents.length; i++)
+                                if (tripStudents[i].StudentId == this.value && tripStudents[i].TripId == $('#tripSelect option:selected').val()) {
+                                    tripStudents.splice(i, 1);
+                                    i = tripStudents.length;
+                                }
+                    });
+
+                $("#tripSelect").change(function () {
+                    $.ajax({
+                        async: false,
+                        url: `/api/trip/getTripStudents/${$("#tripSelect option:selected").val()}`,
+                        method: 'GET',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        statusCode: {
+                            200: function (students) {
+                                tripStudents = [];
+                                $("#studentsContainer").html("");
+                                if (students.length > 0)
+                                    for (let tripStudent of students) {
+                                        if (tripStudent.tripId == $("#tripSelect option:selected").val()) {
+                                            $("#studentsContainer").append(
+                                                '<div class="form-check col-lg-2 col-md-3 col-sm-12 mb-3">' + '<input class="form-check-input" type="checkbox" checked="checked" value="' + tripStudent.studentId + '" data-tripid="' + tripStudent.tripId + '" data-firstname="' + tripStudent.firstName + '" data-lastname="' + tripStudent.lastName + '" name="student" id="student_' + tripStudent.studentId + '">' + '<label class="form-check-label" for="">' + tripStudent.firstName + ' ' + tripStudent.lastName + '</label></div>');
+                                        } else {
+                                            $("#studentsContainer").append(
+                                                '<div class="form-check col-lg-2 col-md-3 col-sm-12 mb-3">' + '<input class="form-check-input" type="checkbox" value="' + tripStudent.studentId + '" data-tripid="' + tripStudent.tripId + '" data-firstname="' + tripStudent.firstName + '" data-lastname="' + tripStudent.lastName + '" name="student" id="student_' + tripStudent.studentId + '">' + '<label class="form-check-label" for="">' + tripStudent.firstName + ' ' + tripStudent.lastName + '</label></div>');
+                                        }
+                                        //$("#" + tripStudent.courseId + tripStudent.levelId).attr("checked", "checked");
+                                        if (tripStudent.tripId == $('#tripSelect option:selected').val())
+                                            tripStudents.push(new Student(tripStudent.studentId, tripStudent.tripId, tripStudent.firstName, tripStudent.lastName));
+                                    }
+
+
+                            }
+                        }
+                    });
+                });
+
+                $("#tripStudentsForm").submit(function (e) {
+                    e.preventDefault();
+
+                    $.ajax({
+                        async: false,
+                        url: '/api/trip/save',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        data: JSON.stringify({
+                            tripStudents: tripStudents
+                        }),
+                        statusCode: {
+                            200: function () {
+                                $("#notification").text("تم تحديث طلاب الرحلة.");
+                                $('.toast').toast('show');
+                            },
+                            400: function () {
+                                $("#notification").text("لم تقم بتعديل طلاب أي رحلة، يرجى التعديل قبل الحفظ.");
+                                $('.toast').toast('show');
+                            },
+                            500: function () {
+                                $("#notification").text("يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً.");
+                                $('.toast').toast('show');
+                            }
+                        }
+                    });
+                });
+            });
+        </script>
+    }
+
+}
+else
+{
+    <h4 style="color: #03E; margin-bottom: 15px;">لا توجد رحلات بعد</h4>
+}

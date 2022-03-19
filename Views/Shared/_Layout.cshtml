@@ -1,7 +1,12 @@
 ﻿@using KiddieParadies.Core.Models
 @using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
+@using KiddieParadies.Core.Services
+@using KiddieParadies.Extensions
 @inject SignInManager<ApplicationUser> _signInManager
+@inject IRepository<Parent> _parentRepository
+@inject IRepository<CourseClassRoom> _classRoomRepository
+@inject IRepository<Employee> _employeeRepository
 <!DOCTYPE html>
 <html lang="ar" dir="rtl" id="document">
 <head>
@@ -96,31 +101,195 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">الخصوصية</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                الأعوام والشواغر
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <li><a class="dropdown-item" asp-controller="Years" asp-action="Index">الأعوام الدراسية</a></li>
-                                <li><a class="dropdown-item" asp-controller="StudentRegistrationInfos" asp-action="Index">مواعيد تسجيل الطلاب</a></li>
-                                <li><a class="dropdown-item" asp-controller="EmployeeRegistrationInfos" asp-action="Index">مواعيد تسجيل الموظفين</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                الأخبار
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <li><a class="dropdown-item" asp-controller="Blogs" asp-action="List">آخر الأخبار</a></li>
-                                <li><a class="dropdown-item" asp-controller="Blogs" asp-action="New">خبر جديد</a></li>
-                            </ul>
-                        </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="StudentRegistration" asp-action="NewParentsProfile">تسجيل طالب</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">حولنا</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="EmployeeRegistration" asp-action="NewEmployeeProfile">انضم لنا</a>
-                        </li>
+                        @if (_signInManager.IsSignedIn(User))
+                        {
+                            var userRole = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value.ToLower();
+                            var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value.ToInt();
+                            switch (userRole)
+                            {
+                                case null:
+                                case "":
+                                    {
+                                        <li class="nav-item">
+                                            <a class="nav-link text-dark" asp-area="" asp-controller="Blogs" asp-action="List">آخر الأخبار</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link text-dark" asp-area="" asp-controller="StudentRegistration" asp-action="NewParentsProfile">تسجيل طالب</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link text-dark" asp-area="" asp-controller="EmployeeRegistration" asp-action="NewEmployeeProfile">انضم لنا</a>
+                                        </li>
+                                    }
+                                    break;
+                                case "admin":
+                                    {
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                الأخبار
+                                            </a>
+                                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                                <li><a class="dropdown-item" asp-controller="Blogs" asp-action="List">آخر الأخبار</a></li>
+                                                <li><a class="dropdown-item" asp-controller="Blogs" asp-action="New">خبر جديد</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                الأعوام والشواغر
+                                            </a>
+                                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                                <li><a class="dropdown-item" asp-controller="Years" asp-action="Index">الأعوام الدراسية</a></li>
+                                                <li><a class="dropdown-item" asp-controller="StudentRegistrationInfos" asp-action="Index">مواعيد تسجيل الطلاب</a></li>
+                                                <li><a class="dropdown-item" asp-controller="EmployeeRegistrationInfos" asp-action="Index">مواعيد تسجيل الموظفين</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                الشؤون
+                                            </a>
+                                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                                <li><a class="dropdown-item" asp-controller="EmployeeRegistration" asp-action="List">إدارة الموظفين</a></li>
+                                                <li><a class="dropdown-item" asp-controller="StudentRegistration" asp-action="ListStudents">إدارة الطلاب وأولياء الأمور</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link text-dark" asp-area="" asp-controller="LevelCourse" asp-action="Index">المقررات</a>
+                                        </li>
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                الرحلات
+                                            </a>
+                                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                                <li><a class="dropdown-item" asp-controller="Trip" asp-action="Index">إدارة الرحلات</a></li>
+                                                <li><a class="dropdown-item" asp-controller="Trip" asp-action="EnrollStudentTrip">إدارة طلاب الرحلات</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link text-dark" asp-area="" asp-controller="WeekProgram" asp-action="Manage">البرنامج الأسبوعي</a>
+                                        </li>
+                                    }
+                                    break;
+                                case "teacher":
+                                    {
+                                        <li class="nav-item">
+                                            <a class="nav-link text-dark" asp-area="" asp-controller="Blogs" asp-action="List">آخر الأخبار</a>
+                                        </li>
+                                        var employee = (await _employeeRepository.GetAsync(e => e.UserId == userId)).First();
+                                        if (!employee.IsValid)
+                                        {
+                                            <li class="nav-item">
+                                                <a class="nav-link text-dark" asp-area="" asp-controller="EmployeeRegistration" asp-action="EditEmployeeProfile" asp-route-id="@employee.Id">تعديل بيانات الموظف</a>
+                                            </li>
+                                        }
+                                        var employeeClasses = await _classRoomRepository.GetAsync(c => c.Teacher.EmployeeId == employee.Id, null, c => c.Course.Level);
+                                        if (employeeClasses.Any())
+                                        {
+                                            var classes = employeeClasses.Select(ec => new
+                                            {
+                                                ec.ClassRoom,
+                                                ec.Course.LevelId
+                                            });
+                                            <li class="nav-item dropdown">
+                                                <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    البرنامج الأسبوعي لصفوف المعلم
+                                                </a>
+                                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                                    @foreach (var classRoom in classes)
+                                                    {
+                                                        <li><a class="dropdown-item" asp-controller="WeekProgram" asp-action="Preview" asp-route-neededLevelId="@classRoom.LevelId" asp-route-neededCourseNumber="@classRoom.ClassRoom">@string.Join(" ", "المستوى", @classRoom.LevelId, "الشعبة", @classRoom.ClassRoom)</a></li>
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+                                    }
+                                    break;
+                                case "driver":
+                                    {
+                                        <li class="nav-item">
+                                            <a class="nav-link text-dark" asp-area="" asp-controller="Blogs" asp-action="List">آخر الأخبار</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link text-dark" asp-area="" asp-controller="Trip" asp-action="Track">إدارة الرحلات</a>
+                                        </li>
+                                        var employee = (await _employeeRepository.GetAsync(e => e.UserId == userId)).First();
+                                        if (!employee.IsValid)
+                                        {
+                                            <li class="nav-item">
+                                                <a class="nav-link text-dark" asp-area="" asp-controller="EmployeeRegistration" asp-action="EditEmployeeProfile" asp-route-id="@employee.Id">تعديل بيانات الموظف</a>
+                                            </li>
+                                        }
+                                    }
+                                    break;
+                                case "escort":
+                                    {
+                                        <li class="nav-item">
+                                            <a class="nav-link text-dark" asp-area="" asp-controller="Blogs" asp-action="List">آخر الأخبار</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link text-dark" asp-area="" asp-controller="Trip" asp-action="Attendance">تفقد الطلاب</a>
+                                        </li>
+                                        var employee = (await _employeeRepository.GetAsync(e => e.UserId == userId)).First();
+                                        if (!employee.IsValid)
+                                        {
+                                            <li class="nav-item">
+                                                <a class="nav-link text-dark" asp-area="" asp-controller="EmployeeRegistration" asp-action="EditEmployeeProfile" asp-route-id="@employee.Id">تعديل بيانات الموظف</a>
+                                            </li>
+                                        }
+                                    }
+                                    break;
+                                case "parent":
+                                    {
+                                        <li class="nav-item">
+                                            <a class="nav-link text-dark" asp-area="" asp-controller="Blogs" asp-action="List">آخر الأخبار</a>
+                                        </li>
+                                        var parent = (await _parentRepository.GetAsync(p => p.UserId == userId, null, p => p.Children)).First();
+                                        if (!parent.IsValid)
+                                        {
+                                            <li class="nav-item">
+                                                <a class="nav-link text-dark" asp-area="" asp-controller="StudentRegistration" asp-action="EditParentsProfile" asp-route-id="@parent.Id">تعديل بيانات أولياء الأمر</a>
+                                            </li>
+                                        }
+                                        if (parent.Children.Any(c => c.IsValid == false))
+                                        {
+                                            <li class="nav-item dropdown">
+                                                <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    تعديل بيانات الأبناء
+                                                </a>
+                                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                                    @foreach (var child in parent.Children)
+                                                    {
+                                                        if (!child.IsValid)
+                                                        {
+                                                            <li><a class="dropdown-item" asp-controller="StudentRegistration" asp-action="EditStudentProfile" asp-route-id="@child.Id">@child.FirstName</a></li>
+
+                                                        }
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+                                        if (parent.Children.Any())
+                                        {
+                                            <li class="nav-item dropdown">
+                                                <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    البرنامج الأسبوعي للأبناء
+                                                </a>
+                                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                                    @foreach (var child in parent.Children)
+                                                    {
+                                                        if ((await _classRoomRepository.GetAsync(c => c.ClassRoom == child.ClassRoom && c.Course.LevelId == child.Level)).Any())
+                                                        {
+                                                            <li><a class="dropdown-item" asp-controller="WeekProgram" asp-action="Preview" asp-route-neededLevelId="@child.Level" asp-route-neededCourseNumber="@child.ClassRoom">@child.FirstName</a></li>
+                                                        }
+                                                    }
+                                                </ul>
+                                            </li>
+                                        }
+                                    }
+                                    break;
+                            }
+                        }
                     </ul>
 
                     <partial name="_LoginPartial" />

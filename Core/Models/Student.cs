@@ -32,11 +32,16 @@ namespace KiddieParadies.Core.Models
 
         public int TripId { get; set; }
 
+        public Trip Trip { get; set; }
+
+        public ICollection<Attendance> Attendances { get; set; }
+
         public ICollection<YearStudent> YearStudents { get; set; }
 
         public Student()
         {
             YearStudents = new List<YearStudent>();
+            //Attendances = new List<Attendance>();
         }
     }
 }

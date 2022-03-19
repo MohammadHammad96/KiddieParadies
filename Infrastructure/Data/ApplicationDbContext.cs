@@ -54,6 +54,10 @@ namespace KiddieParadies.Infrastructure.Data
 
         public DbSet<Notification> Notifications { get; set; }
 
+        public DbSet<Trip> Trips { get; set; }
+
+        public DbSet<Attendance> Attendances { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -147,6 +151,22 @@ namespace KiddieParadies.Infrastructure.Data
             builder.Entity<Message>()
                 .HasOne(m => m.Receiver)
                 .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<Trip>()
+                .HasOne(t => t.Escort)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            //builder.Entity<Trip>().Property<DateTime>(t => t.Time).HasColumnName("Time").HasColumnType("time");
+            builder.Entity<Attendance>()
+                .HasOne(a => a.Trip)
+                .WithMany(t => t.Attendances)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<Student>()
+                .HasOne(s => s.Trip)
+                .WithMany(t => t.Students)
                 .OnDelete(DeleteBehavior.NoAction);
         }
     }

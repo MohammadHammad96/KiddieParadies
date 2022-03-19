@@ -1,0 +1,535 @@
+﻿@using System.Globalization
+@using System.Linq
+@model KiddieParadies.ViewModels.TripViewModel
+@{
+    ViewData["title"] = "الرحلات";
+}
+
+@section styles
+    {
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.4/css/dataTables.bootstrap5.min.css">
+    <style>
+        section {
+            margin-bottom: 15px;
+            padding: 1%;
+        }
+
+        body section:first-of-type {
+            padding: 0px !important;
+        }
+
+        .fa-trash {
+            color: red;
+        }
+
+        .fa-edit {
+            color: #55FF1A;
+        }
+
+        .fas {
+            font-size: 21px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        a img {
+            height: 35px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            margin-top: 4em;
+        }
+
+        ::-webkit-scrollbar-track {
+            border-radius: 10px;
+            margin-top: 3.5em !important;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #FFFEB0;
+            border-radius: 10px;
+        }
+
+        .bg-light {
+            background-color: #FFFEB0 !important;
+        }
+
+        @@media only screen and (max-width: 760px) {
+            /* Force table to not be like tables anymore */
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+            }
+                /* Hide table headers (but not display: none;, for accessibility) */
+                thead tr {
+                    /*position: absolute;
+                top: -9999px;
+                left: -9999px;*/
+                    display: none;
+                }
+
+            tr {
+                border: 1px solid #ccc;
+            }
+
+            td {
+                /* Behave  like a "row" */
+                border: none;
+                border-bottom: 1px solid #eee;
+                position: relative;
+                padding-right: 50% !important;
+            }
+
+                td:before {
+                    /* Now like a table header */
+                    position: absolute;
+                    /* Top/left values mimic padding */
+                    top: 6px;
+                    right: 6px;
+                    width: 45%;
+                    padding-left: 10px;
+                    white-space: nowrap;
+                }
+                /*
+            Label the data
+            */
+
+                td:nth-of-type(1):before {
+                    content: "التوقيت";
+                }
+
+                td:nth-of-type(2):before {
+                    content: "النوع";
+                }
+
+                td:nth-of-type(3):before {
+                    content: "السائق";
+                }
+
+                td:nth-of-type(4):before {
+                    content: "مرافق السائق";
+                }
+
+                td:nth-of-type(5):before {
+                    content: "إدارة";
+                }
+        }
+
+        .toast-container {
+            top: 55px !important;
+        }
+
+        .field-validation-error {
+            color: #F00;
+        }
+
+        .odd {
+            background-color: #F2F0FD;
+        }
+
+        td {
+            border: 1px solid white !important;
+        }
+
+        input {
+            direction: rtl !important;
+            text-align: right !important;
+        }
+    </style>
+}
+
+<section>
+    <button class="btn btn-primary" id="new" data-bs-toggle="modal" data-bs-target="#manageModal">
+        رحلة جديدة
+    </button>
+</section>
+<section class="table-responsive">
+    <table id="info" class="table align-middle display">
+        <thead>
+            <tr>
+                <th scope="col">التوقيت</th>
+                <th scope="col">النوع</th>
+                <th scope="col">السائق</th>
+                <th scope="col">مرافق السائق</th>
+                <th scope="col">إدارة</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Trips.Any())
+            {
+                @foreach (var trip in Model.Trips)
+                {
+                    <tr id="trip_@trip.Id">
+                        <td>@trip.Time.ToString("hh:mm tt", new CultureInfo("ar"))</td>
+                        @if (trip.Type)
+                        {
+                            <td>صباحاً</td>
+                        }
+                        else
+                        {
+                            <td>ظهراً</td>
+                        }
+                        <td data-id="@trip.DriverId">@string.Join(" ", trip.Driver.Employee.FirstName, trip.Driver.Employee.LastName)</td>
+                        <td data-id="@trip.EscortId">@string.Join(" ", trip.Escort.Employee.FirstName, trip.Escort.Employee.LastName)</td>
+                        <td>
+                            <a href="" data-id="@trip.Id" class="edit-btn"><i class="fas fa-edit"></i></a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</section>
+
+<div class="modal fade" id="manageModal" tabindex="-1" aria-labelledby="manageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="manageModalLabel">رحلة جديدة</h5>
+                <button type="button" class="btn-close clear-data" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="errors" style="color: #F00;"></div>
+            @using (Html.BeginForm(method: FormMethod.Post, htmlAttributes: new { @id = "manageTrips" }))
+            {
+                <div class="modal-body">
+                    @if (Model.Drivers.Any())
+                    {
+                        <div class="mb-3">
+                            <label class="col-form-label">السائق</label>
+                            <select class="form-select" required="required" id="driverSelect">
+                                <option value="">...</option>
+                                @foreach (var driver in Model.Drivers)
+                                {
+                                    <option value="@driver.Id">@string.Join(" ", driver.Employee.FirstName, driver.Employee.LastName)</option>
+                                }
+                            </select>
+                        </div>
+                    }
+
+                    @if (Model.Escorts.Any())
+                    {
+                        <div class="mb-3">
+                            <label class="col-form-label">مرافق السائق</label>
+                            <select class="form-select" required="required" id="escortSelect">
+                                <option value="">...</option>
+                                @foreach (var escort in Model.Escorts)
+                                {
+                                    <option value="@escort.Id">@string.Join(" ", escort.Employee.FirstName, escort.Employee.LastName)</option>
+                                }
+                            </select>
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label class="col-form-label">التوقيت</label>
+                        <input type="time" class="form-control" required="required" id="time">
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input type" type="radio" value="true" name="type" required="required">
+                            <label class="form-check-label" for="">
+                                صباحاً
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input type" type="radio" value="false" name="type" required="required">
+                            <label class="form-check-label" for="">
+                                ظهراً
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="tripId" />
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" id="addBtn">إضافة</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+@section scripts
+    {
+    <script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.4/js/dataTables.bootstrap5.min.js"></script>
+
+    <script type="text/javascript">
+
+        function ToInputTime(time) {
+            let hours = Number(time.match(/^(\d+)/)[1]);
+            let minutes = Number(time.match(/:(\d+)/)[1]);
+            let amPm = time.match(/\s(.*)$/)[1];
+            if (amPm == "م" && hours < 12)
+                hours = hours + 12;
+            if (amPm == "ص" && hours == 12)
+                hours = hours - 12;
+            var sHours = hours.toString();
+            var sMinutes = minutes.toString();
+            if (hours < 10)
+                sHours = `0${sHours}`;
+            if (minutes < 10)
+                sMinutes = `0${sMinutes}`;
+            let result = sHours + ":" + sMinutes;
+            return result;
+        }
+
+        function ToDisplayTime(dateTime) {
+            dateTime = dateTime.split('T');
+            dateTime = dateTime[1];
+            var time = dateTime.split(":");
+            if (time[0] == "00") {
+                time = "12:" + time[1] + " ص";
+            }
+            else if (time[0] == "12") {
+                time = "12:" + time[1] + " م";
+            }
+            else if (parseInt(time[0]) > 12) {
+                if ((parseInt(time[0]) % 12) > 9)
+                    time = (parseInt(time[0]) % 12) + ":" + time[1] + " م";
+                else
+                    time = "0" + (parseInt(time[0]) % 12) + ":" + time[1] + " م";
+            }
+            else if (parseInt(time[0]) < 12) {
+                time = time[0] + ":" + time[1] + " ص";
+            }
+            dateTime = time;
+            return dateTime;
+        }
+
+        function ClearInputs() {
+            tripId = null;
+            $("#driverSelect").val("");
+            $("#escortSelect").val("");
+            $("#time").val("");
+            $("input.type").prop('checked', false);
+            $("#tripId").val(0);
+        }
+
+        function IgnoreUTC(dateTime) {
+            let hoursDiff = dateTime.getHours() - dateTime.getTimezoneOffset() / 60;
+            let minutesDiff = (dateTime.getMinutes() - dateTime.getTimezoneOffset()) % 60;
+            dateTime.setHours(hoursDiff);
+            dateTime.setMinutes(minutesDiff);
+            return dateTime;
+        }
+
+        $(document).ready(function () {
+
+            var infoTable = $('#info').DataTable({
+                "columnDefs": [
+                    { "type": "date-dd-MM-yyyy", targets: 0 }
+                ],
+                "language": {
+                    "url": "https://cdn.datatables.net/plug-ins/1.11.4/i18n/ar.json"
+                }
+            });
+
+            // sort date
+            (function () {
+
+                var customDateDDMMMYYYYToOrd = function (date) {
+                    "use strict"; //let's avoid tom-foolery in this function
+                    // Convert to a number YYYYMMDD which we can use to order
+                    var dateParts = date.split(/-/);
+                    return (dateParts[2] * 10000) +
+                        ($.inArray(dateParts[1].toUpperCase(),
+                            ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]) *
+                            100) +
+                        (dateParts[0] * 1);
+                };
+
+                // This will help DataTables magic detect the "dd-MMM-yyyy" format; Unshift
+                // so that it's the first data type (so it takes priority over existing)
+                jQuery.fn.dataTableExt.aTypes.unshift(
+                    function (sData) {
+                        "use strict"; //let's avoid tom-foolery in this function
+                        if (/^([0-2]?\d|3[0-1])-(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)-\d{4}/i.test(sData)) {
+                            return 'date-dd-mmm-yyyy';
+                        }
+                        return null;
+                    }
+                );
+
+                // define the sorts
+                jQuery.fn.dataTableExt.oSort['date-dd-mmm-yyyy-asc'] = function (a, b) {
+                    "use strict"; //let's avoid tom-foolery in this function
+                    var ordA = customDateDDMMMYYYYToOrd(a),
+                        ordB = customDateDDMMMYYYYToOrd(b);
+                    return (ordA < ordB) ? -1 : ((ordA > ordB) ? 1 : 0);
+                };
+
+                jQuery.fn.dataTableExt.oSort['date-dd-mmm-yyyy-desc'] = function (a, b) {
+                    "use strict"; //let's avoid tom-foolery in this function
+                    var ordA = customDateDDMMMYYYYToOrd(a),
+                        ordB = customDateDDMMMYYYYToOrd(b);
+                    return (ordA < ordB) ? 1 : ((ordA > ordB) ? -1 : 0);
+                };
+
+            })();
+            // end sort date
+
+            var tripId = null;
+
+            $("#info").on("click",
+                "a.edit-btn",
+                function (e) {
+                    e.preventDefault();
+                    tripId = $(this).attr('data-id');
+                    $("#tripId").val(tripId);
+                    var tableRow = $("#trip_" + tripId);
+                    $("#time").val(ToInputTime(tableRow.children().eq(0).text()));
+                    if (tableRow.children().eq(0).text() == "صباحاً")
+                        $("input.type")[0].checked = true;
+                    else
+                        $("input.type")[1].checked = true;
+                    /*$("#driverSelect option[value='" + tableRow.children().eq(2).attr("data-id") + "']");
+                    $("#escortSelect option[value='" + tableRow.children().eq(3).attr("data-id") + "']");*/
+                    $("#driverSelect").val(tableRow.children().eq(2).attr("data-id"));
+                    $("#escortSelect").val(tableRow.children().eq(3).attr("data-id"));
+                    $("#time").val(ToInputTime(tableRow.children().eq(0).text()));
+                    $('#manageModal button[type="submit"]').text('حفظ التعديلات');
+                    $("#manageModalLabel").text("تعديل معلومات رحلة");
+                    $('#manageModal').modal('toggle');
+                });
+
+            $("#new").click(callback => {
+                $('#manageModal button[type="submit"]').text('إضافة');
+                $("#manageModalLabel").text("رحلة جديدة");
+                ClearInputs();
+            });
+
+            $('#manageTrips').submit(function (e) {
+                e.preventDefault();
+
+                if ($('#manageModal button[type="submit"]').text() == "حفظ التعديلات") {
+                    $.ajax({
+                        async: false,
+                        url: '/api/trip/edit',
+                        method: 'PUT',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        data: JSON.stringify({
+                            Id: $('#tripId').val(),
+                            Time: IgnoreUTC(new Date("2022-03-17 " + $("#time").val())),
+                            Type: $("input.type:checked").val() == "true",
+                            DriverId: $("#driverSelect option:selected").val(),
+                            EscortId: $("#escortSelect option:selected").val()
+                        }),
+                        statusCode: {
+                            200: function (trip) {
+                                var row = $("#trip_" + tripId);
+                                row.find("td").eq(0).text(ToDisplayTime(trip.time));
+                                row.find("td").eq(1).text($("input.type:checked").next("label").text().trim());
+                                row.find("td").eq(2).text($("#driverSelect option:selected").text());
+                                row.find("td").eq(2).attr("data-id", $("#driverSelect option:selected").val());
+                                row.find("td").eq(3).text($("#escortSelect option:selected").text());
+                                row.find("td").eq(3).attr("data-id", $("#escortSelect option:selected").val());
+                                $('#manageModal').modal('toggle');
+                                $("#notification").text("تم حفظ التعديلات على الرحلة بنجاح.");
+                                $('.toast').toast('show');
+                                ClearInputs();
+                            },
+                            400: function (response) {
+                                var errorList = "<p>يرجى إصلاح الأخطاء التالية</p><ul>";
+                                if (response.responseJSON != undefined)
+                                    for (var field in response.responseJSON) {
+                                        for (var error of response.responseJSON[field]) {
+                                            if (field.length > 2)
+                                                errorList += "<li>الحقل '" + field + "': " + error + "</li>";
+                                            else
+                                                errorList += "<li>" + error + "</li>";
+                                        }
+                                    }
+                                else
+                                    errorList += "<li>" + response.responseText + "</li>";
+                                errorList += "</ul>";
+                                $("#errors").html(errorList);
+                                $('#errors')[0].scrollIntoView({ behavior: 'smooth' });
+                            },
+                            500: function () {
+                                $('#manageModal').modal('toggle');
+                                ClearInputs();
+                                $("#notification").text("يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً");
+                                $('.toast').toast('show');
+                            },
+                            404: function () {
+                                $('#manageModal').modal('toggle');
+                                ClearInputs();
+                                $("#notification").text("الرحلة المطلوبة غير موجودة");
+                                $('.toast').toast('show');
+                            }
+                        }
+                    });
+                }
+                else if ($('#manageModal button[type="submit"]').text() == "إضافة") {
+                    $.ajax({
+                        async: false,
+                        url: '/api/trip/add',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        data: JSON.stringify({
+                            Id: $('#tripId').val(),
+                            Time: IgnoreUTC(new Date("2022-03-17 " + $("#time").val())),
+                            Type: $("input.type:checked").val() == "true",
+                            DriverId: $("#driverSelect option:selected").val(),
+                            EscortId: $("#escortSelect option:selected").val()
+                        }),
+                        statusCode: {
+                            200: function (trip) {
+                                //console.log(trip.time);
+                                console.log(ToDisplayTime(trip.time));
+                                //console.log(trip.time);
+                                infoTable.row.add([
+                                    ToDisplayTime(trip.time),
+                                    $("input.type:checked").next("label").text().trim(),
+                                    $("#driverSelect option:selected").text(),
+                                    $("#escortSelect option:selected").text(),
+                                    '<a href="" class="edit-btn" data-id=' +
+                                    trip.id +
+                                    '><i class="fas fa-edit"></i></a>'
+                                ]).node().id = "trip_" + trip.id;
+                                infoTable.draw(false);
+                                $(`#trip_${trip.id}`).find("td").eq(2).attr("data-id", trip.driverId);
+                                $(`#trip_${trip.id}`).find("td").eq(3).attr("data-id", trip.escortId);
+                                $('#manageModal').modal('toggle');
+                                $("#notification").text("تمت إضافة الرحلة بنجاح.");
+                                $('.toast').toast('show');
+                                ClearInputs();
+                            },
+                            400: function (response) {
+                                var errorList = "<p>يرجى إصلاح الأخطاء التالية</p><ul>";
+                                if (response.responseJSON != undefined)
+                                    for (var field in response.responseJSON) {
+                                        for (var error of response.responseJSON[field]) {
+                                            if (field.length > 2)
+                                                errorList += "<li>الحقل '" + field + "': " + error + "</li>";
+                                            else
+                                                errorList += "<li>" + error + "</li>";
+                                        }
+                                    }
+                                else
+                                    errorList += "<li>" + response.responseText + "</li>";
+                                errorList += "</ul>";
+                                $("#errors").html(errorList);
+                                $('#errors')[0].scrollIntoView({ behavior: 'smooth' });
+                            },
+                            500: function () {
+                                $('#manageModal').modal('toggle');
+                                ClearInputs();
+                                $("#notification").text("يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً");
+                                $('.toast').toast('show');
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

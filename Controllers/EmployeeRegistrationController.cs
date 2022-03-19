@@ -166,6 +166,7 @@ namespace KiddieParadies.Controllers
                         .Save(viewModel.Resume, EmployeesMainFolderName, EmployeesResumesFolderName);
                     employee.IsValid = true;
 
+                    employee.EmployeeYears.Add(new YearEmployee { YearId = year.Id });
                     await _employeeRepository.AddAsync(employee);
                     await _userManager.AddToRoleAsync(user, viewModel.Role);
                     //await _yearEmployeeRepository.AddAsync(new YearEmployee { EmployeeId = employee.Id, YearId = year.Id });
@@ -201,8 +202,6 @@ namespace KiddieParadies.Controllers
 
                 if (await _unitOfWork.SaveChangesAsync() <= 0)
                 {
-                    await _userManager.AddToRoleAsync(user, viewModel.Role);
-                    await _unitOfWork.SaveChangesAsync();
                     if (viewModel.Image != null && viewModel.Image.Length != 0)
                         _imagesRepository.Delete(employeeToUpdate.ImageName, EmployeesImagesFolderName);
                     if (viewModel.Resume != null && viewModel.Resume.Length != 0)
@@ -212,6 +211,8 @@ namespace KiddieParadies.Controllers
                     ModelState.AddModelError("FirstName", "يوجد خطأ بالمخدم، يرجى المحاولة لاحقاً");
                     return View("EmployeeForm", viewModel);
                 }
+                await _userManager.AddToRoleAsync(user, viewModel.Role);
+                await _unitOfWork.SaveChangesAsync();
 
                 if (viewModel.Image != null && viewModel.Image.Length != 0)
                     _imagesRepository.Delete(previousImageName, EmployeesImagesFolderName);

@@ -4,14 +4,16 @@ using KiddieParadies.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KiddieParadies.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220318222735_FixTripsTable")]
+    partial class FixTripsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -164,34 +166,6 @@ namespace KiddieParadies.Data.Migrations
                     b.HasIndex("CourseId");
 
                     b.ToTable("Assignments");
-                });
-
-            modelBuilder.Entity("KiddieParadies.Core.Models.Attendance", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("IsAttend")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("TripId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StudentId");
-
-                    b.HasIndex("TripId");
-
-                    b.ToTable("Attendances");
                 });
 
             modelBuilder.Entity("KiddieParadies.Core.Models.Blog", b =>
@@ -624,7 +598,7 @@ namespace KiddieParadies.Data.Migrations
                     b.Property<int>("ParentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TripId")
+                    b.Property<int?>("TripId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -633,8 +607,6 @@ namespace KiddieParadies.Data.Migrations
                         .IsUnique();
 
                     b.HasIndex("ParentId");
-
-                    b.HasIndex("TripId");
 
                     b.HasIndex("FirstName", "ParentId");
 
@@ -699,34 +671,6 @@ namespace KiddieParadies.Data.Migrations
                     b.HasIndex("YearId");
 
                     b.ToTable("StudentRegistrationsInfos");
-                });
-
-            modelBuilder.Entity("KiddieParadies.Core.Models.Trip", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("DriverId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EscortId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Type")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DriverId");
-
-                    b.HasIndex("EscortId");
-
-                    b.ToTable("Trips");
                 });
 
             modelBuilder.Entity("KiddieParadies.Core.Models.Year", b =>
@@ -943,25 +887,6 @@ namespace KiddieParadies.Data.Migrations
                     b.Navigation("Course");
                 });
 
-            modelBuilder.Entity("KiddieParadies.Core.Models.Attendance", b =>
-                {
-                    b.HasOne("KiddieParadies.Core.Models.Student", "Student")
-                        .WithMany("Attendances")
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("KiddieParadies.Core.Models.Trip", "Trip")
-                        .WithMany("Attendances")
-                        .HasForeignKey("TripId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Student");
-
-                    b.Navigation("Trip");
-                });
-
             modelBuilder.Entity("KiddieParadies.Core.Models.Blog", b =>
                 {
                     b.HasOne("KiddieParadies.Core.Models.Year", "Year")
@@ -1110,15 +1035,7 @@ namespace KiddieParadies.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("KiddieParadies.Core.Models.Trip", "Trip")
-                        .WithMany("Students")
-                        .HasForeignKey("TripId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.Navigation("Parent");
-
-                    b.Navigation("Trip");
                 });
 
             modelBuilder.Entity("KiddieParadies.Core.Models.StudentCourse", b =>
@@ -1153,25 +1070,6 @@ namespace KiddieParadies.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Year");
-                });
-
-            modelBuilder.Entity("KiddieParadies.Core.Models.Trip", b =>
-                {
-                    b.HasOne("KiddieParadies.Core.Models.YearEmployee", "Driver")
-                        .WithMany()
-                        .HasForeignKey("DriverId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("KiddieParadies.Core.Models.YearEmployee", "Escort")
-                        .WithMany()
-                        .HasForeignKey("EscortId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Driver");
-
-                    b.Navigation("Escort");
                 });
 
             modelBuilder.Entity("KiddieParadies.Core.Models.YearEmployee", b =>
@@ -1322,16 +1220,7 @@ namespace KiddieParadies.Data.Migrations
 
             modelBuilder.Entity("KiddieParadies.Core.Models.Student", b =>
                 {
-                    b.Navigation("Attendances");
-
                     b.Navigation("YearStudents");
-                });
-
-            modelBuilder.Entity("KiddieParadies.Core.Models.Trip", b =>
-                {
-                    b.Navigation("Attendances");
-
-                    b.Navigation("Students");
                 });
 
             modelBuilder.Entity("KiddieParadies.Core.Models.Year", b =>

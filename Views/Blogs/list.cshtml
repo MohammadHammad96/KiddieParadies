@@ -21,39 +21,41 @@
     <meta property="og:type" content="article" />
 }
 
-@foreach (var blog in Model)
-{
-    <div class="row">
-        <div class="col-md-10">
-            <div class="row">
+@if (Model.Any())
+    foreach (var blog in Model)
+    {
+        <div class="row">
+            <div class="col-md-10">
                 <div class="row">
-                    @Html.ActionLink(blog.Title, "GetById", "Blogs", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-8" })
-                    <span class="col-lg-3 col-md-4 col-sm-12">@blog.Time.ToString("ddd dd-MM-yyyy hh:mm tt", new CultureInfo("ar"))</span>
-                </div>
-                <div class="row">
-                    <span class="col-md-12">@blog.ShortContent</span>
-                </div>
-                @if (_signInManager.IsSignedIn(User) && User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin"))
-                {
                     <div class="row">
-                        @Html.ActionLink("تعديل", "Edit", "Blogs", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-1 offset-md-10 col-sm-2 offset-sm-8" })
-                        @Html.ActionLink("حذف", "Delete", "Blogs", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-1 col-sm-2" })
+                        @Html.ActionLink(blog.Title, "GetById", "Blogs", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-8" })
+                        <span class="col-lg-3 col-md-4 col-sm-12">@blog.Time.ToString("ddd dd-MM-yyyy hh:mm tt", new CultureInfo("ar"))</span>
                     </div>
+                    <div class="row">
+                        <span class="col-md-12">@blog.ShortContent</span>
+                    </div>
+                    @if (_signInManager.IsSignedIn(User) && User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "Admin"))
+                    {
+                        <div class="row">
+                            @Html.ActionLink("تعديل", "Edit", "Blogs", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-1 offset-md-10 col-sm-2 offset-sm-8" })
+                            @Html.ActionLink("حذف", "Delete", "Blogs", routeValues: new { id = blog.Id }, htmlAttributes: new { @class = "col-md-1 col-sm-2" })
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="col-md-2">
+                @{
+                    if (string.IsNullOrWhiteSpace(blog.MainImageName))
+                    {
+                        <img src="~/Logo.png" style="height: 140px;">
+                    }
+                    else
+                    {
+                        <img src="/images/news/@blog.MainImageName" style="height: 140px;">
+                    }
                 }
             </div>
         </div>
-        <div class="col-md-2">
-            @{
-                if (string.IsNullOrWhiteSpace(blog.MainImageName))
-                {
-                    <img src="~/Logo.png" style="height: 140px;">
-                }
-                else
-                {
-                    <img src="/images/news/@blog.MainImageName" style="height: 140px;">
-                }
-            }
-        </div>
-    </div>
-    <hr>
+        <hr>
+    }
 }

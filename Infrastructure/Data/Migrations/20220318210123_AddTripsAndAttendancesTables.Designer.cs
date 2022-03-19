@@ -4,14 +4,16 @@ using KiddieParadies.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KiddieParadies.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220318210123_AddTripsAndAttendancesTables")]
+    partial class AddTripsAndAttendancesTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -624,17 +626,12 @@ namespace KiddieParadies.Data.Migrations
                     b.Property<int>("ParentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TripId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ImageName")
                         .IsUnique();
 
                     b.HasIndex("ParentId");
-
-                    b.HasIndex("TripId");
 
                     b.HasIndex("FirstName", "ParentId");
 
@@ -714,8 +711,8 @@ namespace KiddieParadies.Data.Migrations
                     b.Property<int>("EscortId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeSpan>("Time")
+                        .HasColumnType("time");
 
                     b.Property<bool>("Type")
                         .HasColumnType("bit");
@@ -1110,15 +1107,7 @@ namespace KiddieParadies.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("KiddieParadies.Core.Models.Trip", "Trip")
-                        .WithMany("Students")
-                        .HasForeignKey("TripId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.Navigation("Parent");
-
-                    b.Navigation("Trip");
                 });
 
             modelBuilder.Entity("KiddieParadies.Core.Models.StudentCourse", b =>
@@ -1157,13 +1146,13 @@ namespace KiddieParadies.Data.Migrations
 
             modelBuilder.Entity("KiddieParadies.Core.Models.Trip", b =>
                 {
-                    b.HasOne("KiddieParadies.Core.Models.YearEmployee", "Driver")
+                    b.HasOne("KiddieParadies.Core.Models.ApplicationUser", "Driver")
                         .WithMany()
                         .HasForeignKey("DriverId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("KiddieParadies.Core.Models.YearEmployee", "Escort")
+                    b.HasOne("KiddieParadies.Core.Models.ApplicationUser", "Escort")
                         .WithMany()
                         .HasForeignKey("EscortId")
                         .OnDelete(DeleteBehavior.NoAction)
@@ -1330,8 +1319,6 @@ namespace KiddieParadies.Data.Migrations
             modelBuilder.Entity("KiddieParadies.Core.Models.Trip", b =>
                 {
                     b.Navigation("Attendances");
-
-                    b.Navigation("Students");
                 });
 
             modelBuilder.Entity("KiddieParadies.Core.Models.Year", b =>

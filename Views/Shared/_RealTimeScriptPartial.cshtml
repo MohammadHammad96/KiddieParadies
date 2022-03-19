@@ -19,7 +19,7 @@
 
     <script>
 
-        function ToDisplayDateTime(dateTime) {
+        function ToDisplayRealTimeDateTime(dateTime) {
             if (dateTime.includes("T")) {
                 dateTime = dateTime.split('T');
                 var date = dateTime[0];
@@ -64,7 +64,7 @@
                                         chatIndexes.push(messages[0].id);
                                         var chatSummary = '<div class="chatSummary" style="cursor: pointer; height: 50px; margin-top: 5px;" data-receiverId="' + user.id;
                                         chatSummary += '" data-receiverName="' + user.name + '" data-receiverImagePath="' + user.imagePath;
-                                        chatSummary += '" title="' + ToDisplayDateTime(messages[0].time);
+                                        chatSummary += '" title="' + ToDisplayRealTimeDateTime(messages[0].time);
                                         chatSummary += '"><img src=' + user.imagePath + ' style="width: 15%; float: right; height: 100%; margin-right: 5px; border-radius: 100%;" />';
                                         chatSummary += '<div style="height: 100%; width: 80%; float: left;">';
                                         chatSummary += '<span>' + user.name + '</span><div>';
@@ -108,7 +108,7 @@
                     if (notifications.length > 0) {
                         for (let notification of notifications) {
                             var notificationSummary = '<a href="' + notification.url + '" class="notificationSummary" data-isRead="' + notification.isRead + '" data-id="' + notification.id + '" style="text-decoration: none; color: black;"><div';
-                            notificationSummary += '" title="' + ToDisplayDateTime(notification.time);
+                            notificationSummary += '" title="' + ToDisplayRealTimeDateTime(notification.time);
                             notificationSummary += '">';
                             notificationSummary += '<div style="width: 95%; margin: 2.5%;';
                             if (notification.isRead == false)
@@ -117,7 +117,7 @@
                             if (notification.isRead == false)
                                 notificationSummary += " (غير مقروء)";
                             notificationSummary += '</span><div style="text-align: left;">';
-                            notificationSummary += ToDisplayDateTime(notification.time);
+                            notificationSummary += ToDisplayRealTimeDateTime(notification.time);
                             notificationSummary += '</div></div></div></a><hr />';
                             $("#notifications").append(notificationSummary);
                         }
@@ -172,7 +172,7 @@
                         200: function (message) {
                             $("#messageInput").val("");
                             let lis = '<li class="pl-2 pr-2 bg-primary rounded text-white text-center send-msg mb-1"';
-                            lis += ' style="text-align: right !important;" title="' + ToDisplayDateTime(message.time) + '">';
+                            lis += ' style="text-align: right !important;" title="' + ToDisplayRealTimeDateTime(message.time) + '">';
                             lis += message.content;
                             lis += '</li>';
                             $(".chat-content").find("div").eq(0).find("ul").eq(0).append(lis);
@@ -181,7 +181,7 @@
 
                             $(".chatSummary").each(function(index) {
                                 if ($(this).attr("data-receiverId") == receiverId) {
-                                    $(this).attr("title", ToDisplayDateTime(message.time));
+                                    $(this).attr("title", ToDisplayRealTimeDateTime(message.time));
                                     if (message.content.length <= 18)
                                         $(this).find("div").eq(0).find("div").eq(0).text(message.content);
                                     else
@@ -243,11 +243,11 @@
                             for (let message of messages) {
                                 if (message.senderId == userId) {
                                     lis += '<li class="pl-2 pr-2 bg-primary rounded text-white text-center send-msg mb-1"';
-                                    lis += ' style="text-align: right !important;" title="' + ToDisplayDateTime(message.time) + '">';
+                                    lis += ' style="text-align: right !important;" title="' + ToDisplayRealTimeDateTime(message.time) + '">';
                                     lis += message.content;
                                     lis += '</li>';
                                 } else {
-                                    lis += '<li class="p-1 rounded mb-1"><div class="receive-msg" style="width:100%" title="' + ToDisplayDateTime(message.time) + '">';
+                                    lis += '<li class="p-1 rounded mb-1"><div class="receive-msg" style="width:100%" title="' + ToDisplayRealTimeDateTime(message.time) + '">';
                                     lis += '<img src="' + imagePath + '">';
                                     lis += '<div class="receive-msg-desc text-center mt-1 ml-1 pl-2 pr-2" style="float: left; max-width: 84%">';
                                     lis += '<p class="pl-2 pr-2 rounded" style="text-align: right !important;">' + message.content + '</p>';
@@ -301,11 +301,11 @@
                             flag = message;
                             if (message.senderId == userId) {
                                 lis += '<li class="pl-2 pr-2 bg-primary rounded text-white text-center send-msg mb-1"';
-                                lis += ' style="text-align: right !important;" title="' + ToDisplayDateTime(message.time) + '">';
+                                lis += ' style="text-align: right !important;" title="' + ToDisplayRealTimeDateTime(message.time) + '">';
                                 lis += message.content;
                                 lis += '</li>';
                             } else {
-                                lis += '<li class="p-1 rounded mb-1"><div class="receive-msg" style="width: 100%;" title="' + ToDisplayDateTime(message.time) + '">';
+                                lis += '<li class="p-1 rounded mb-1"><div class="receive-msg" style="width: 100%;" title="' + ToDisplayRealTimeDateTime(message.time) + '">';
                                 lis += '<img src="' + userImage + '">';
                                 lis += '<div class="receive-msg-desc text-center mt-1 ml-1 pl-2 pr-2" style="float: left; max-width: 85%;">';
                                 lis += '<p class="pl-2 pr-2 rounded" style="text-align: right !important;">' + message.content + '</p>';
@@ -322,7 +322,7 @@
 
                         $(".chatSummary").each(function (index) {
                             if ($(this).attr("data-receiverId") == receiverId) {
-                                $(this).attr("title", ToDisplayDateTime(flag.time));
+                                $(this).attr("title", ToDisplayRealTimeDateTime(flag.time));
                                 if (flag.content.length <= 18)
                                     $(this).find("div").eq(0).find("div").eq(0).text(flag.content);
                                 else
@@ -408,11 +408,11 @@
                             for (let message of messages) {
                                 if (message.senderId == userId) {
                                     lis += '<li class="pl-2 pr-2 bg-primary rounded text-white text-center send-msg mb-1"';
-                                    lis += ' style="text-align: right !important;" title="' + ToDisplayDateTime(message.time) + '">';
+                                    lis += ' style="text-align: right !important;" title="' + ToDisplayRealTimeDateTime(message.time) + '">';
                                     lis += message.content;
                                     lis += '</li>';
                                 } else {
-                                    lis += '<li class="p-1 rounded mb-1"><div class="receive-msg" style="width: 100%;" title="' + ToDisplayDateTime(message.time) + '">';
+                                    lis += '<li class="p-1 rounded mb-1"><div class="receive-msg" style="width: 100%;" title="' + ToDisplayRealTimeDateTime(message.time) + '">';
                                     lis += '<img src="' + userImage + '">';
                                     lis += '<div class="receive-msg-desc text-center mt-1 ml-1 pl-2 pr-2" style="float: left; max-width: 85%;">';
                                     lis += '<p class="pl-2 pr-2 rounded" style="text-align: right !important;">' + message.content + '</p>';
@@ -451,7 +451,7 @@ else if (_signInManager.IsSignedIn(User))
 
     <script>
 
-        function ToDisplayDateTime(dateTime) {
+        function ToDisplayRealTimeDateTime(dateTime) {
             if (dateTime.includes("T")) {
                 dateTime = dateTime.split('T');
                 var date = dateTime[0];
@@ -487,7 +487,7 @@ else if (_signInManager.IsSignedIn(User))
                     if (notifications.length > 0) {
                         for (let notification of notifications) {
                             var notificationSummary = '<a href="' + notification.url + '" class="notificationSummary" data-isRead="' + notification.isRead + '" data-id="' + notification.id + '" style="text-decoration: none; color: black;"><div';
-                            notificationSummary += '" title="' + ToDisplayDateTime(notification.time);
+                            notificationSummary += '" title="' + ToDisplayRealTimeDateTime(notification.time);
                             notificationSummary += '">';
                             notificationSummary += '<div style="width: 95%; margin: 2.5%;';
                             if (notification.isRead == false)
@@ -496,7 +496,7 @@ else if (_signInManager.IsSignedIn(User))
                             if (notification.isRead == false)
                                 notificationSummary += " (غير مقروء)";
                             notificationSummary += '</span><div style="text-align: left;">';
-                            notificationSummary += ToDisplayDateTime(notification.time);
+                            notificationSummary += ToDisplayRealTimeDateTime(notification.time);
                             notificationSummary += '</div></div></div></a><hr />';
                             $("#notifications").append(notificationSummary);
                         }
@@ -563,11 +563,11 @@ statusCode: {
                 flag = message;
                 if (message.senderId == userId) {
                     lis += '<li class="pl-2 pr-2 bg-primary rounded text-white text-center send-msg mb-1"';
-                    lis += ' style="text-align: right !important;" title="' + ToDisplayDateTime(message.time) + '">';
+                    lis += ' style="text-align: right !important;" title="' + ToDisplayRealTimeDateTime(message.time) + '">';
                     lis += message.content;
                     lis += '</li>';
                 } else {
-                    lis += '<li class="p-1 rounded mb-1"><div class="receive-msg" style="width: 100%;" title="' + ToDisplayDateTime(message.time) + '">';
+                    lis += '<li class="p-1 rounded mb-1"><div class="receive-msg" style="width: 100%;" title="' + ToDisplayRealTimeDateTime(message.time) + '">';
                     lis += '<img src="' + userImage + '">';
                     lis += '<div class="receive-msg-desc text-center mt-1 ml-1 pl-2 pr-2" style="float: left; max-width: 85%;">';
                     lis += '<p class="pl-2 pr-2 rounded" style="text-align: right !important;">' + message.content + '</p>';
@@ -584,7 +584,7 @@ statusCode: {
 
             $(".chatSummary").each(function (index) {
                 if ($(this).attr("data-receiverId") == receiverId) {
-                    $(this).attr("title", ToDisplayDateTime(flag.time));
+                    $(this).attr("title", ToDisplayRealTimeDateTime(flag.time));
                     if (flag.content.length <= 18)
                         $(this).find("div").eq(0).find("div").eq(0).text(flag.content);
                     else

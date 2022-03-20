@@ -5,13 +5,54 @@
 
 @section styles
 {
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Handlee&family=Nunito&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Flaticon Font -->
+    <link href="/MainFiles/lib/flaticon/font/flaticon.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="/MainFiles/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="/MainFiles/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="/MainFiles/css/style.css" rel="stylesheet">
+
     <style>
-        h1, h3 {
-            color: #F00;
+
+        #errorDiv {
+            text-align: right !important;
+        }
+
+        .footer {
+            text-align: right !important;
+        }
+
+        #errorParagraph {
+            color: rgb(102, 102, 102) !important;
         }
     </style>
 }
 
-<h1>خطأ</h1>
-
-<h3>@Model.Message</h3>
+<!-- About Start -->
+<div class="container-fluid py-5" id="errorDiv">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-5">
+                <img class="img-fluid rounded mb-5 mb-lg-0" src="/MainFiles/img/generic-error.jpg" alt="">
+            </div>
+            <div class="col-lg-7">
+                <p class="section-title pr-5"><span class="pr-2">حدث خطأ ما</span></p>
+                <h1 class="mb-4">تم حدوث خطأ في التطبيق</h1>
+                <p id="errorParagraph">
+                    @Model.Message
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- About End -->

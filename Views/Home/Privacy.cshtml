@@ -3,7 +3,6 @@
 @{
     ViewData["Title"] = "سياسة الخصوصية";
 }
-<h1>@ViewData["Title"]</h1>
 
 @section metaTags
 {
@@ -16,4 +15,61 @@
     <meta property="og:type" content="website" />
 }
 
-<p>استخدم هذه الصفحة لشرح سياسة الخصوصية.</p>
+@section scripts{
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Handlee&family=Nunito&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Flaticon Font -->
+    <link href="/MainFiles/lib/flaticon/font/flaticon.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="/MainFiles/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="/MainFiles/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="/MainFiles/css/style.css" rel="stylesheet">
+    <style>
+        #PrivacyDiv, .footer {
+            text-align: right !important;
+        }
+    </style>
+}
+
+<!-- About Start -->
+<div class="container-fluid py-5">
+    <div class="container">
+        <div class="row align-items-center" id="PrivacyDiv">
+            <div class="col-lg-5">
+                <img class="img-fluid rounded mb-5 mb-lg-0" src="/MainFiles/img/privacy.jpg" alt="">
+            </div>
+            <div class="col-lg-7">
+                <p class="section-title pr-5"><span class="pr-2">سياسة الخصوصية</span></p>
+                <h1 class="mb-4">نحن نحمي بياناتك</h1>
+                <p>
+                    حماية والحفاظ على البيانات الشخصية الخاصة بزوار وأعضاء موقع روضة السعادة أحد
+                    أهم أولوياتنا، يقدم بيان وسياسة الخصوصية شرحًا عن كيفية قيام موقع روضة السعادة
+                    بجمع المعلومات الشخصية للأعضاء والزوار وطرق استعمال هذه المعلومات.
+                    من خلال دخولك موقع روضة السعادة أو التسجيل في أحد خدماته فإنك تعطي موقع روضة السع
+                    ادة الموافقة بجمع واستخدام المعلومات الشخصية الخاصة بك كما هو موضح في بيان وسياسة
+                    الخصوصية أدناه، بالإضافة إلي الموافقة علي جميع ماذكر في هذه الصفحة.
+
+                    يقوم موقع روضة السعادة بجمع بياناتك الشخصية بطريقة مباشرة من خلالك أو بشكل غير مبا
+                    شر، يقوم موقع روضة السعادة بجمع هذه البيانات من خلال المعلومات التي تقدمها بنفسك ب
+                    غرض التسجيل في أيًا من خدمات الموقع الإلكتروني،
+                    وتشمل هذه البيانات على سبيل المثال الاسم الشخصي، الجنس، تاريخ الميلاد، الوظيفة، ال
+                    عنوان البريدي، البريد الإلكتروني، رقم الهاتف وغيرها من البيانات، بالإضافة إلى معلوما
+                    تم الحصول عليها بسبب استخدامك
+                    وتصفحك لأي من صفحات الموقع مثل عنوان الآي بي الخاص بك، نظام التشغيل المستخدام ونوع المتصفح
+                    فح، مزود خدمة الانترنت، الوقت الذي تستغرقه في كل صفحة والصفحات التي تقوم بزيارتها، وا
+                    لردود والمشاركات التي تقوم بإضافتها وغيرها،
+                    بالإضافة إلى أي معلومات أخرى تشارك بها موقع روضة السعادة .
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- About End -->

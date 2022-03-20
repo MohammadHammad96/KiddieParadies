@@ -1,0 +1,84 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration _configuration
+@{
+    ViewData["Title"] = "من نحن";
+}
+
+@section metaTags
+{
+    <meta property="og:image" content="@($"{Context.Request.Scheme}://{Context.Request.Host}/Logo.png")" />
+
+    <meta property="og:description" content="من نحن" />
+    <meta property="og:url" content="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}{Context.Request.QueryString}")" />
+    <meta property="og:title" content="روضة السعادة" />
+    <meta property="fb:app_id" content="@_configuration["Authentication:Facebook:AppId"]" />
+    <meta property="og:type" content="website" />
+}
+
+@section styles{
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Handlee&family=Nunito&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Flaticon Font -->
+    <link href="/MainFiles/lib/flaticon/font/flaticon.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="/MainFiles/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="/MainFiles/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="/MainFiles/css/style.css" rel="stylesheet">
+
+    <style>
+        .footer, #aboutUsDiv {
+            text-align: right !important;
+        }
+
+        #aboutUsParagraph, .color {
+            color: #666666;
+        }
+    </style>
+}
+
+<!-- About Start -->
+<div class="container-fluid py-5">
+    <div class="container">
+        <div class="row align-items-center" id="aboutUsDiv">
+            <div class="col-lg-5">
+                <img class="img-fluid rounded mb-5 mb-lg-0" src="/MainFiles/img/about-1.jpg" alt="">
+            </div>
+            <div class="col-lg-7">
+                <p class="section-title pr-5"><span class="pr-2">لماذا نحن؟</span></p>
+                <h1 class="mb-4">أفضل الخيارات بالنسبة لرياض الأطفال</h1>
+                <p id="aboutUsParagraph">
+                    بعيداً عن رياض الأطفال التقليدية، تتميّز روضة السعادة بتطبيق تكنولوجيا المعلومات
+                    في عملية التعليم من خلال البرمجيات التي تسهل التواصل بين أهالي الأطفال والطاقم التربوي.
+                    كما تقوم روضة الشعادة باستخدام تقنية تتبع الموقع الجغرافي لمعرفة موقع الحافلة عند توصيل
+                    الأطقال من  وإلى الروضة وتعزيز الأمان عن طريق التفقد الإلكتروني الذي يجريه مرافق سائق الحافلة.
+                    وتعد روضة السعادة مثالاً تربوياً يحتذي في قطاع المؤسسات التربوية الكبيرة المحلية والعالمية لإمكاناتها
+                    المادية والتكنولوجية الملبية لمتطلبات العصر وحرصها الدائم على التطوير والتحديث في العملية التربوية
+                    وركنها الأساسي وهو المعلم فحرصت على تدريبه بشكل مستمر لتزويده بأحدث أساليب التدريس والتقويم ليكون
+                    متميزاً في تطبيق استراتيجيات التدريس المثيرة للتفكير وتعلم الطلبة للوصول إلى التعلم المبدع الخلاق وفي جميع
+                    المجالات التربوية الحديثة.
+                </p>
+                <div class="row pt-2 pb-4">
+                    <div class="col-6 col-md-4">
+                        <img class="img-fluid rounded" src="/MainFiles/img/about-2.jpg" alt="">
+                    </div>
+                    <div class="col-6 col-md-8">
+                        <ul class="list-inline m-0">
+                            <li class="py-2 border-top border-bottom color"><i class="fa fa-check text-primary ml-3"></i>تمكين التسجيل الإلكتروني من المنزل</li>
+                            <li class="py-2 border-bottom color"><i class="fa fa-check text-primary ml-3"></i>تحديد موقع حافلة توصيل الأطفال عن طريق GPS</li>
+                            <li class="py-2 border-bottom color"><i class="fa fa-check text-primary ml-3"></i>تطبيق التواصل عن طريق الأجهزة الذكية</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- About End -->

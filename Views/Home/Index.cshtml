@@ -1,5 +1,8 @@
 ﻿@using Microsoft.Extensions.Configuration
+@using KiddieParadies.Core.Services
+@using KiddieParadies.Core.Models
 @inject IConfiguration _configuration
+@inject IRepository<Blog> _blogsRepository
 @{
     ViewData["Title"] = "الرئيسية";
 }
@@ -17,4 +20,312 @@
     <meta property="og:type" content="website" />
 }
 
-<img src="Logo.png" />
+@section styles
+{
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Handlee&family=Nunito&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Flaticon Font -->
+    <link href="/MainFiles/lib/flaticon/font/flaticon.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="/MainFiles/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="/MainFiles/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            text-align: right !important;
+        }
+    </style>
+}
+
+<!-- Header Start -->
+<div class="container-fluid bg-primary px-0 px-md-5 mb-5">
+    <div class="row align-items-center px-3">
+        <div class="col-lg-6 text-center text-lg-left">
+            <h1 class="text-white mb-4 mt-5 mt-lg-0">روضة السعادة</h1>
+            <h1 class="display-3 font-weight-bold text-white" style="text-align: right">ليست مجرد روضة أطفال تقليدية!</h1>
+            <p class="text-white mb-4" style="text-align: right">
+                في روضة السعادة، نحن ننتقل لمستوى آخر في العملية التربوية والتعليمية،
+                حيث نقوم بإدخال أحدث التقنيات  للوصول لأعلى درجات  التأهيل والإعداد لطفلك.
+            </p>
+            @Html.ActionLink("تعرف علينا أكثر", "AboutUs", "Home", null, new { @class = "btn btn-secondary mt-1 py-3 px-5" })
+        </div>
+        <div class="col-lg-6 text-center text-lg-right">
+            <img class="img-fluid mt-5" src="/MainFiles/img/header.png" alt="">
+        </div>
+    </div>
+</div>
+<!-- Header End -->
+<!-- Facilities Start -->
+<div class="container-fluid pt-5">
+    <div class="container pb-3">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 pb-1">
+                <div class="d-flex bg-light shadow-sm border-top rounded mb-4" style="padding: 30px;">
+                    <i class="flaticon-050-fence h1 font-weight-normal text-primary mb-3"></i>
+                    <div class="pr-4">
+                        <h4>مناهج متطورة</h4>
+                        <p class="m-0"> اعتماد أحدث المناهج المعتمدة من قبل أفضل مؤسسات تأهيل الأطفال العالمية</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 pb-1">
+                <div class="d-flex bg-light shadow-sm border-top rounded mb-4" style="padding: 30px;">
+                    <i class="flaticon-022-drum h1 font-weight-normal text-primary mb-3"></i>
+                    <div class="pr-4">
+                        <h4>تفعيل تكنولوجيا المعلومات</h4>
+                        <p class="m-0">  استخدام أحدث الأنطمة في عملية إعداد النشاطات التعليمية فيام بين أهالي الطلاب وضمن الطاقم التربوي</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 pb-1">
+                <div class="d-flex bg-light shadow-sm border-top rounded mb-4" style="padding: 30px;">
+                    <i class="flaticon-030-crayons h1 font-weight-normal text-primary mb-3"></i>
+                    <div class="pr-4">
+                        <h4>تطوير المهارات المختلفة</h4>
+                        <p class="m-0">التركيز على تنمية وتطوير المهارات الدفينة لدى الطفل في شتى المجالات كالرسم، والعزف على الآلات الموسيقية</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 pb-1">
+                <div class="d-flex bg-light shadow-sm border-top rounded mb-4" style="padding: 30px;">
+                    <i class="flaticon-017-toy-car h1 font-weight-normal text-primary mb-3"></i>
+                    <div class="pr-4">
+                        <h4>المواصلات الآمنة</h4>
+                        <p class="m-0">اعتماد أحدث الأنظمة لمتابعة عملية النقل عن طريق تطبيق خدمات الموقع الجغرافي والتفقد الإلكتروني</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 pb-1">
+                <div class="d-flex bg-light shadow-sm border-top rounded mb-4" style="padding: 30px;">
+                    <i class="flaticon-025-sandwich h1 font-weight-normal text-primary mb-3"></i>
+                    <div class="pr-4">
+                        <h4>الأطعمة الصحية</h4>
+                        <p class="m-0"> نقديم وجبات الطعام للأطفال الرغابين بذلك وفق جدول صحي ومنفذ من قبل خبراء تغذية</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 pb-1">
+                <div class="d-flex bg-light shadow-sm border-top rounded mb-4" style="padding: 30px;">
+                    <i class="flaticon-047-backpack h1 font-weight-normal text-primary mb-3"></i>
+                    <div class="pr-4">
+                        <h4>رحلات وأنشطة تعليمية</h4>
+                        <p class="m-0">تنظيم رحلات وأنشطة تعليمية إلى منشآت انتاجية أو تعليمية لتعزيز نظرة الطفل المستقبلية</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Facilities Start -->
+<!-- About Start -->
+<div class="container-fluid py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-5">
+                <img class="img-fluid rounded mb-5 mb-lg-0" src="/MainFiles/img/about-1.jpg" alt="">
+            </div>
+            <div class="col-lg-7">
+                <p class="section-title pr-5"><span class="pr-2">لماذا نحن؟</span></p>
+                <h1 class="mb-4">أفضل الخيارات بالنسبة لرياض الأطفال</h1>
+                <p>
+                    بعيداً عن رياض الأطفال التقليدية، تتميّز روضة السعادة بتطبيق تكنولوجيا المعلومات
+                    في عملية التعليم من خلال البرمجيات التي تسهل التواصل بين أهالي الأطفال والطاقم التربوي...
+                </p>
+                <div class="row pt-2 pb-4">
+                    <div class="col-6 col-md-4">
+                        <img class="img-fluid rounded" src="/MainFiles/img/about-2.jpg" alt="">
+                    </div>
+                    <div class="col-6 col-md-8">
+                        <ul class="list-inline m-0">
+                            <li class="py-2 border-top border-bottom"><i class="fa fa-check text-primary ml-3"></i>تمكين التسجيل الإلكتروني من المنزل</li>
+                            <li class="py-2 border-bottom"><i class="fa fa-check text-primary ml-3"></i>تحديد موقع حافلة توصيل الأطفال عن طريق GPS</li>
+                            <li class="py-2 border-bottom"><i class="fa fa-check text-primary ml-3"></i>تطبيق التواصل عن طريق الأجهزة الذكية</li>
+                        </ul>
+                    </div>
+                </div>
+                @Html.ActionLink("تعرف علينا أكثر", "AboutUs", "Home", null, new { @class = "btn btn-secondary mt-1 py-3 px-5" })
+            </div>
+        </div>
+    </div>
+</div>
+<!-- About End -->
+<!-- Class Start -->
+<div class="container-fluid pt-5">
+    <div class="container">
+        <div class="text-center pb-2">
+            <p class="section-title px-5"><span class="px-2">صفوف مميزة</span></p>
+            <h1 class="mb-4">إضافة المتعة لعملية التعليم!</h1>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 mb-5">
+                <div class="card border-0 bg-light shadow-sm pb-2">
+                    <img class="card-img-top mb-2" src="/MainFiles/img/class-1.jpg" alt="">
+                    <div class="card-body text-center">
+                        <h4 class="card-title">دروس الرسم والموسيقا</h4>
+                        <p class="card-text">إضافة الدروس التي تنمّي موهبة الرسم والعزف على الآلات الموسيقية كجزء أساسي في عملية التعليم</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-5">
+                <div class="card border-0 bg-light shadow-sm pb-2">
+                    <img class="card-img-top mb-2" src="/MainFiles/img/class-2.jpg" alt="">
+                    <div class="card-body text-center">
+                        <h4 class="card-title">دروس اللغات الأجنبية</h4>
+                        <p class="card-text">اعتماد اللغات الأجنبية ضمن مستويات متدرجة لجعل الطفل يكتسب المهارات اللغوية بشكل مبكر </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-5">
+                <div class="card border-0 bg-light shadow-sm pb-2">
+                    <img class="card-img-top mb-2" src="/MainFiles/img/class-3.jpg" alt="">
+                    <div class="card-body text-center">
+                        <h4 class="card-title">العلوم الأساسية</h4>
+                        <p class="card-text">التركيز على تكثيف وتعميق المفاهيم اأساسية المتعلقة بالعلوم المختلفة كالرياضيات ومبادئ العلوم المنطقية</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Class End -->
+<!-- Team Start -->
+<div class="container-fluid pt-5">
+    <div class="container">
+        <div class="text-center pb-2">
+            <p class="section-title px-5"><span class="px-2">الطاقم التعليمي</span></p>
+            <h1 class="mb-4">تعرّف على الطاقم التعليمي في الروضة</h1>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-lg-3 text-center team mb-5">
+                <div class="position-relative overflow-hidden mb-4" style="border-radius: 100%;">
+                    <img class="img-fluid w-100" src="/MainFiles/img/team-1.jpg" alt="">
+                    <div class="team-social d-flex align-items-center justify-content-center w-100 h-100 position-absolute">
+                    </div>
+                </div>
+                <h4>ريم أحمد</h4>
+                <i>مدرسة اللغة الإنكليزية</i>
+            </div>
+            <div class="col-md-6 col-lg-3 text-center team mb-5">
+                <div class="position-relative overflow-hidden mb-4" style="border-radius: 100%;">
+                    <img class="img-fluid w-100" src="/MainFiles/img/team-2.jpg" alt="">
+                    <div class="team-social d-flex align-items-center justify-content-center w-100 h-100 position-absolute">
+                    </div>
+                </div>
+                <h4>محمد ادناوي</h4>
+                <i>مدرس مبادئ الكمبيوتر</i>
+            </div>
+            <div class="col-md-6 col-lg-3 text-center team mb-5">
+                <div class="position-relative overflow-hidden mb-4" style="border-radius: 100%;">
+                    <img class="img-fluid w-100" src="/MainFiles/img/team-3.jpg" alt="">
+                    <div class="team-social d-flex align-items-center justify-content-center w-100 h-100 position-absolute">
+                    </div>
+                </div>
+                <h4>بشرى ابراهيم</h4>
+                <i>مدرسة رسم</i>
+            </div>
+            <div class="col-md-6 col-lg-3 text-center team mb-5">
+                <div class="position-relative overflow-hidden mb-4" style="border-radius: 100%;">
+                    <img class="img-fluid w-100" src="/MainFiles/img/team-4.jpg" alt="">
+                    <div class="team-social d-flex align-items-center justify-content-center w-100 h-100 position-absolute">
+                    </div>
+                </div>
+                <h4>محمد حماد</h4>
+                <i>مدرس رياضيات</i>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Team End -->
+@{
+    var blogs = await _blogsRepository.GetAsync(null, o => o.OrderByDescending(b => b.Time));
+    if (blogs.Any())
+    {
+        <!-- Blog Start -->
+        <div class="container-fluid pt-5">
+            <div class="container">
+                <div class="text-center pb-2">
+                    <p class="section-title px-5"><span class="px-2">ما هو جديدنا؟</span></p>
+                    <h1 class="mb-4">أخبار ونشاطات الروضة</h1>
+                </div>
+                <div class="row pb-3">
+                    @{
+                        int count = blogs.Count();
+                        if (count >= 3 || count == 2)
+                        {
+                            for (int i = 0; i < count; i++)
+                            {
+                                <div class="col-lg-@(12/count) mb-4">
+                                    <div class="card border-0 shadow-sm mb-2">
+                                        @if (string.IsNullOrWhiteSpace(blogs.ElementAt(i).MainImageName))
+                                        {
+                                            <img class="card-img-top mb-2" src="/Logo.png" alt="@blogs.ElementAt(i).Title">
+                                        }
+                                        else
+                                        {
+                                            <img class="card-img-top mb-2" src="/images/news/@blogs.ElementAt(i).MainImageName" alt="@blogs.ElementAt(i).Title">
+                                        }
+
+                                        <div class="card-body bg-light text-center p-4">
+                                            <h4 class="">@blogs.ElementAt(i).Title</h4>
+                                            <p>@blogs.ElementAt(i).ShortContent</p>
+                                            @Html.ActionLink("قراءة المزيد", "GetById", "Blogs", new { id = blogs.ElementAt(i).Id }, new { @class = "btn btn-primary px-4 mx-auto my-2" })
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            var blog = blogs.First();
+                            <div class="col-lg-8 offset-lg-2 mb-4">
+                                <div class="card border-0 shadow-sm mb-2">
+                                    @if (string.IsNullOrWhiteSpace(blog.MainImageName))
+                                    {
+                                        <img class="card-img-top mb-2" src="/MainFiles/img/blog-2.jpg" alt="@blog.Title">
+                                    }
+                                    else
+                                    {
+                                        <img class="card-img-top mb-2" src="/images/news/@blog.MainImageName" alt="@blog.Title">
+                                    }
+
+                                    <div class="card-body bg-light text-center p-4">
+                                        <h4 class="">@blog.Title</h4>
+                                        <p>@blog.ShortContent</p>
+                                        @Html.ActionLink("قراءة المزيد", "GetById", "Blogs", new { id = blog.Id }, new { @class = "btn btn-primary px-4 mx-auto my-2" })
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+
+                </div>
+            </div>
+        </div>
+        <!-- Blog End -->
+    }
+}
+
+@section scripts
+{
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="/MainFiles/lib/easing/easing.min.js"></script>
+    <script src="/MainFiles/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="/MainFiles/lib/isotope/isotope.pkgd.min.js"></script>
+    <script src="/MainFiles/lib/lightbox/js/lightbox.min.js"></script>
+
+    <!-- Contact Javascript File -->
+    <script src="/MainFiles/mail/jqBootstrapValidation.min.js"></script>
+    <script src="/MainFiles/mail/contact.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="/MainFiles/js/main.js"></script>
+}

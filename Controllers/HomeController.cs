@@ -24,5 +24,10 @@ namespace KiddieParadies.Controllers
         {
             return View("NotFound");
         }
+
+        public IActionResult AboutUs()
+        {
+            return View();
+        }
     }
 }

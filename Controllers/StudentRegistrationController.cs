@@ -557,7 +557,7 @@ namespace KiddieParadies.Controllers
                     .Save(viewModel.Image, StudentsImagesFolderName);
                 student.YearStudents.Add(new YearStudent { YearId = year.Id });
                 await _studentRepository.AddAsync(student);
-                student.TripId = (await _tripRepository.GetAsync()).First().Id;
+                student.TripId = 0;
                 //await _yearStudentRepository.AddAsync(new YearStudent { StudentId = student.Id, YearId = year.Id });
                 if (await _unitOfWork.SaveChangesAsync() > 0)
                     return RedirectToAction("NewParentsProfile");

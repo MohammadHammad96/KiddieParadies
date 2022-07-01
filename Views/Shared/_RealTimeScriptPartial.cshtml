@@ -55,7 +55,7 @@
                     let chatIndexes = [];
                     for (let user of users) {
                         $.ajax({
-                            async: false,
+                            async: true,
                             type: "GET",
                             url: "/api/chat/getChat/" + user.id,
                             statusCode: {
@@ -100,7 +100,7 @@
         });
 
         $.ajax({
-            async: false,
+            async: true,
             type: "GET",
             url: "/api/notification/getAll",
             statusCode: {
@@ -368,7 +368,7 @@
         }, {
             name: 'user',
             templates: {
-                suggestion: Handlebars.compile('<div class="chatSummary" style="cursor: pointer; height: 50px; margin-top: 5px;"> <img src={{imagePath}} style="width: 15%; float: right; height: 100%; margin-right: 5px; border-radius: 100%;" /> <div style="height: 100%; width: 80%; float: left;"><span>{{name}}</span><div></div></div></div><hr />')
+                suggestion: Handlebars.compile('<div class="chatSummary" style="cursor: pointer; height: 50px; margin-top: 5px;" data-receiverId="{{id}}" data-receiverName="{{name}}"> <img src={{imagePath}} style="width: 15%; float: right; height: 100%; margin-right: 5px; border-radius: 100%;" /> <div style="height: 100%; width: 80%; float: left;"><span>{{name}}</span><div></div></div></div><hr />')
             },
             limit: 500,
             source: users
